@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>ichortower.FontSmasher</RootNamespace>
+		<Version>0.8.0-alpha</Version>
+		<TargetFramework>net6.0</TargetFramework>
+		<Configuration>Release</Configuration>
+		<EnableHarmony>true</EnableHarmony>
+
+		<ModFolderName>FontSmasher</ModFolderName>
+		<EnableModZip>false</EnableModZip>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+	</ItemGroup>
+</Project>
