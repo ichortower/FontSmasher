@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
+
 namespace ichortower.FontSmasher;
 
 internal static class CodeMatcherExtensions
@@ -53,5 +55,14 @@ internal static class CodeMatcherExtensions
         int originalPos = cm.Pos;
         CodeMatcher finder = cm.Clone().MatchStartForward(matches);
         return cm.RemoveInstructionsInRange(originalPos, finder.Pos - 1);
+    }
+
+    /*
+     * Scale a rectangle by an integer percentage.
+     */
+    public static Rectangle Scale(this Rectangle rect, int percent)
+    {
+        return new Rectangle(rect.X * percent / 100, rect.Y * percent / 100,
+                rect.Width * percent / 100, rect.Height * percent / 100);
     }
 }

@@ -45,6 +45,7 @@ internal sealed class GridGlyph
 internal sealed class AtlasGlyph
 {
     public string? Texture = null;
+    public MetricsSource? CopyMetrics = null;
     public Rectangle? SourceRect = null;
     public GlyphMargins? Margins = null;
     public float? LeftSideBearing = null;
@@ -57,6 +58,21 @@ internal sealed class GlyphMargins
     public int? Right = 0;
     public int? Top = 0;
     public int? Bottom = 0;
+
+    public GlyphMargins Scale(int percent) {
+        return new GlyphMargins() {
+            Left = this.Left * percent / 100,
+            Right = this.Right * percent / 100,
+            Top = this.Top * percent / 100,
+            Bottom = this.Bottom * percent / 100,
+        };
+    }
+}
+
+internal sealed class MetricsSource
+{
+    public string Source = "SmallFont";
+    public int Scale = 100;
 }
 
 #nullable disable

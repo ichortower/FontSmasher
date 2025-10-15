@@ -24,12 +24,17 @@ internal sealed class SpriteFonts
         "Fonts/SmallFont",
         "Fonts/tinyFont",
     };
+    internal static string[] DataFieldNames = new [] {
+        nameof(GlyphEntry.SpriteFont1),
+        nameof(GlyphEntry.SmallFont),
+        nameof(GlyphEntry.TinyFont),
+    };
     internal static FieldInfo[] DataFields = new [] {
-        typeof(GlyphEntry).GetField(nameof(GlyphEntry.SpriteFont1),
+        typeof(GlyphEntry).GetField(DataFieldNames[0],
                 BindingFlags.Public | BindingFlags.Instance),
-        typeof(GlyphEntry).GetField(nameof(GlyphEntry.SmallFont),
+        typeof(GlyphEntry).GetField(DataFieldNames[1],
                 BindingFlags.Public | BindingFlags.Instance),
-        typeof(GlyphEntry).GetField(nameof(GlyphEntry.TinyFont),
+        typeof(GlyphEntry).GetField(DataFieldNames[2],
                 BindingFlags.Public | BindingFlags.Instance),
     };
 
@@ -68,9 +73,36 @@ internal sealed class SpriteFonts
                     Character = kvp.Key,
                 };
             }
-            Log.Info($"editing glyph '{kvp.Key}' in font {fontName}");
+
+            // sub out our source for numerical stuff if needed, but leave texture alone
+            if (which.CopyMetrics is not null) {
+                try {
+                    int i = Array.IndexOf(DataFieldNames, which.CopyMetrics.Source);
+                    AtlasGlyph fromObj = (AtlasGlyph)DataFields[i].GetValue(entry);
+                    if (fromObj.LeftSideBearing is not null) {
+                        which.LeftSideBearing = fromObj.LeftSideBearing *
+                                which.CopyMetrics.Scale / 100;
+                    }
+                    if (fromObj.RightSideBearing is not null) {
+                        which.RightSideBearing = fromObj.RightSideBearing *
+                                which.CopyMetrics.Scale / 100;
+                    }
+                    which.SourceRect = fromObj.SourceRect?.Scale(which.CopyMetrics.Scale);
+                    which.Margins = fromObj.Margins?.Scale(which.CopyMetrics.Scale);
+                }
+                catch (Exception e) {
+                    Log.Warn($"For glyph '{kvp.Key}' ({fontName}): this glyph failed to " +
+                            $"copy metrics from target '{which.CopyMetrics.Source}'. " +
+                            $"Skipping this glyph. {e}");
+                    continue;
+                }
+            }
+
             if (which.LeftSideBearing is not null) {
                 glyph.LeftSideBearing = (float)which.LeftSideBearing;
+            }
+            if (which.RightSideBearing is not null) {
+                glyph.RightSideBearing = (float)which.RightSideBearing;
             }
             // for new glyphs, this will always be defined (see above warning), but existing ones
             // might (should?) leave it alone
@@ -85,12 +117,6 @@ internal sealed class SpriteFonts
             glyph.Cropping = new Rectangle(margins.Left ?? 0, margins.Top ?? 0,
                     margins.Left ?? 0 + margins.Right ?? 0 + (int)glyph.Width,
                     Math.Max(fullHeight, target.LineSpacing));
-            //if (which.Container is not null) {
-                //glyph.Cropping = (Rectangle)which.Container;
-            //}
-            if (which.RightSideBearing is not null) {
-                glyph.RightSideBearing = (float)which.RightSideBearing;
-            }
             glyph.WidthIncludingBearings = glyph.LeftSideBearing + glyph.Width +
                     glyph.RightSideBearing;
             // texture check comes at the end since sourcerect may or may not be in our data
