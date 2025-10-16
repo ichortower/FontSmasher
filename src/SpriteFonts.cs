@@ -50,7 +50,9 @@ internal sealed class SpriteFonts
 
     internal static bool PatchFont(int index, out string err)
     {
-        SpriteFont target = Game1.content.Load<SpriteFont>(AssetNames[index]);
+        // load from helper content manager since Game1.content's copy had its line spacing
+        // altered after loading and the change persists in cache
+        SpriteFont target = Main.instance.Helper.GameContent.Load<SpriteFont>(AssetNames[index]);
         string fontName = DataFields[index].Name;
         // the procedure here is "unpack the data, edit it, and reconstruct the SpriteFont",
         // since SpriteFont is hostile to editing
@@ -128,7 +130,6 @@ internal sealed class SpriteFonts
                 });
             }
 
-            Log.Info(glyph.ToString());
             fontGlyphs[kvp.Key] = glyph;
         }
 
@@ -188,11 +189,13 @@ internal sealed class SpriteFonts
             charList.Add(g.Character);
             bearingList.Add(new(g.LeftSideBearing, g.Width, g.RightSideBearing));
         }
+        // preserve Game1's mutated line spacings
+        int copiedSpacing = ((SpriteFont)FontFields[index].GetValue(Game1.game1)).LineSpacing;
         SpriteFont recons = new(sourceTex,
                 boundsList,
                 containerList,
                 charList,
-                target.LineSpacing,
+                copiedSpacing,
                 target.Spacing,
                 bearingList,
                 target.DefaultCharacter);
