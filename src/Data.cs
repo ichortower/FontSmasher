@@ -29,7 +29,7 @@ internal sealed class GlyphEntry
     public GridGlyph? Dialogue = null;
     public GridGlyph? DialogueColored = null;
     public GridGlyph? Junimo = null;
-    public int BothSidesWidthOffset = 0;
+    public int? BothSidesWidthOffset = null;
     public AtlasGlyph? SmallFont = null;
     public AtlasGlyph? SpriteFont1 = null;
     public AtlasGlyph? TinyFont = null;

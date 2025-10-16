@@ -81,9 +81,9 @@ internal class Patches
     internal static void SpriteText_getWidthOffsetForChar_Postfix(
             char c, ref int __result)
     {
-        if (Glyphs.Data.TryGetValue(c, out var val)) {
-            __result = val.BothSidesWidthOffset;
-            return;
+        if (Glyphs.Data.TryGetValue(c, out var val) &&
+                val.BothSidesWidthOffset is not null) {
+            __result = (int)val.BothSidesWidthOffset;
         }
         /*
         if (!Main.Config.ReplaceVanillaDialogueFont) {
