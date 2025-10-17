@@ -33,6 +33,7 @@ internal sealed class GlyphEntry
     public AtlasGlyph? SmallFont = null;
     public AtlasGlyph? SpriteFont1 = null;
     public AtlasGlyph? TinyFont = null;
+    public AtlasGlyph? OneX = null;
 }
 
 internal sealed class GridGlyph

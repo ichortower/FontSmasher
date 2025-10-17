@@ -11,6 +11,10 @@ namespace ichortower.FontSmasher;
 
 internal sealed class SpriteFonts
 {
+    /*
+     * Keep these arrays in sync, except note that DataFieldNames has the special extra value
+     * 'OneX', which is not parsed on its own but serves only as a 1x source for CopyMetrics
+     */
     internal static FieldInfo[] FontFields = new [] {
         typeof(Game1).GetField(nameof(Game1.dialogueFont),
                 BindingFlags.Public | BindingFlags.Static),
@@ -28,15 +32,13 @@ internal sealed class SpriteFonts
         nameof(GlyphEntry.SpriteFont1),
         nameof(GlyphEntry.SmallFont),
         nameof(GlyphEntry.TinyFont),
+        nameof(GlyphEntry.OneX),
     };
-    internal static FieldInfo[] DataFields = new [] {
-        typeof(GlyphEntry).GetField(DataFieldNames[0],
-                BindingFlags.Public | BindingFlags.Instance),
-        typeof(GlyphEntry).GetField(DataFieldNames[1],
-                BindingFlags.Public | BindingFlags.Instance),
-        typeof(GlyphEntry).GetField(DataFieldNames[2],
-                BindingFlags.Public | BindingFlags.Instance),
-    };
+    // this array is automatic tho
+    internal static FieldInfo[] DataFields = DataFieldNames.Select((name) => {
+        return typeof(GlyphEntry).GetField(name,
+                BindingFlags.Public | BindingFlags.Instance);
+    }).ToArray();
 
     public static void PatchIn()
     {
