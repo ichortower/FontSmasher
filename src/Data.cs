@@ -48,20 +48,22 @@ internal sealed class AtlasGlyph
     public string? Texture = null;
     public MetricsSource? CopyMetrics = null;
     public Rectangle? SourceRect = null;
-    public GlyphMargins? Margins = null;
+    public GlyphPadding? Padding = null;
+    public int? AboveBaseline = null;
+    public int? BelowBaseline = null;
     public float? LeftSideBearing = null;
     public float? RightSideBearing = null;
 }
 
-internal sealed class GlyphMargins
+internal sealed class GlyphPadding
 {
-    public int? Left = 0;
-    public int? Right = 0;
-    public int? Top = 0;
-    public int? Bottom = 0;
+    public int? Left = null;
+    public int? Right = null;
+    public int? Top = null;
+    public int? Bottom = null;
 
-    public GlyphMargins Scale(int percent) {
-        return new GlyphMargins() {
+    public GlyphPadding Scale(int percent) {
+        return new GlyphPadding() {
             Left = this.Left * percent / 100,
             Right = this.Right * percent / 100,
             Top = this.Top * percent / 100,
@@ -72,7 +74,7 @@ internal sealed class GlyphMargins
 
 internal sealed class MetricsSource
 {
-    public string Source = "SmallFont";
+    public string Source = "OneX";
     public int Scale = 100;
 }
 

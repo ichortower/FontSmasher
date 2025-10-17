@@ -28,6 +28,11 @@ internal sealed class SpriteFonts
         "Fonts/SmallFont",
         "Fonts/tinyFont",
     };
+    internal static int[] Baselines = new [] {
+        36,
+        24,
+        21,
+    };
     internal static string[] DataFieldNames = new [] {
         nameof(GlyphEntry.SpriteFont1),
         nameof(GlyphEntry.SmallFont),
@@ -91,8 +96,16 @@ internal sealed class SpriteFonts
                         which.RightSideBearing = fromObj.RightSideBearing *
                                 which.CopyMetrics.Scale / 100;
                     }
+                    if (fromObj.AboveBaseline is not null) {
+                        which.AboveBaseline = fromObj.AboveBaseline *
+                                which.CopyMetrics.Scale / 100;
+                    }
+                    else if (fromObj.BelowBaseline is not null) {
+                        which.BelowBaseline = fromObj.BelowBaseline *
+                                which.CopyMetrics.Scale / 100;
+                    }
                     which.SourceRect = fromObj.SourceRect?.Scale(which.CopyMetrics.Scale);
-                    which.Margins = fromObj.Margins?.Scale(which.CopyMetrics.Scale);
+                    which.Padding = fromObj.Padding?.Scale(which.CopyMetrics.Scale);
                 }
                 catch (Exception e) {
                     Log.Warn($"For glyph '{kvp.Key}' ({fontName}): this glyph failed to " +
@@ -115,12 +128,17 @@ internal sealed class SpriteFonts
                 // this 16 is bad but it shouldn't be possible to fall back to it
                 glyph.Width = which.SourceRect?.Width ?? 16f;
             }
-            // TODO see if we need to tweak Width after this
-            GlyphMargins margins = which.Margins ?? new();
-            int fullHeight = margins.Top ?? 0 + margins.Bottom ?? 0 + glyph.BoundsInTexture.Height;
-            glyph.Cropping = new Rectangle(margins.Left ?? 0, margins.Top ?? 0,
-                    margins.Left ?? 0 + margins.Right ?? 0 + (int)glyph.Width,
+            GlyphPadding padding = which.Padding ?? new();
+            // honor padding.top if given, but otherwise default to on-baseline
+            if (which.Padding?.Top is null) {
+                int dist = (which.AboveBaseline ?? (-1 * (which.BelowBaseline ?? 0)));
+                padding.Top = Baselines[index] - dist - glyph.BoundsInTexture.Height;
+            }
+            int fullHeight = padding.Top ?? 0 + padding.Bottom ?? 0 + glyph.BoundsInTexture.Height;
+            glyph.Cropping = new Rectangle(padding.Left ?? 0, padding.Top ?? 0,
+                    (padding.Left ?? 0) + (padding.Right ?? 0) + (int)glyph.Width,
                     Math.Max(fullHeight, target.LineSpacing));
+            glyph.Width = glyph.Cropping.Width;
             glyph.WidthIncludingBearings = glyph.LeftSideBearing + glyph.Width +
                     glyph.RightSideBearing;
             // texture check comes at the end since sourcerect may or may not be in our data

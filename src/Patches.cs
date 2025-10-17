@@ -54,7 +54,7 @@ internal class Patches
     }
 
     internal static void SpriteBatch_DrawString_Prefix(
-            ref SpriteFont spriteFont)
+            SpriteFont spriteFont)
     {
         int i = -1;
         if (System.Object.ReferenceEquals(spriteFont, Game1.dialogueFont)) {
