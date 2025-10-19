@@ -82,8 +82,8 @@ internal class Patches
             char c, ref int __result)
     {
         if (Glyphs.Data.TryGetValue(c, out var val) &&
-                val.BothSidesWidthOffset is not null) {
-            __result = (int)val.BothSidesWidthOffset;
+                (val?.Bold?.LeftRightPadding ?? -1) >= 0) {
+            __result = -1 * (int)val.Bold.LeftRightPadding;
         }
         /*
         if (!Main.Config.ReplaceVanillaDialogueFont) {
@@ -192,41 +192,41 @@ internal class Patches
     {
         GridGlyph found = null;
         if (Glyphs.Data.TryGetValue(c, out var entry)) {
-            if (coloredText && entry.DialogueColored is not null) {
-                found = entry.DialogueColored;
+            if (coloredText && entry?.Bold?.Colored is not null) {
+                found = entry.Bold.Colored;
             }
-            else if (junimoText && entry.Junimo is not null) {
-                found = entry.Junimo;
+            else if (junimoText && entry?.Bold?.Junimo is not null) {
+                found = entry.Bold.Junimo;
             }
-            else if (entry.Dialogue is not null) {
-                found = entry.Dialogue;
+            else if (entry?.Bold?.Dialogue is not null) {
+                found = entry.Bold.Dialogue;
             }
         }
         
         if (found?.Texture is not null && (found?.SpriteIndex ?? -1) >= 0) {
             sourceTexture = Game1.content.Load<Texture2D>(found.Texture);
-            sourceRect = new((found.SpriteIndex * 8) % sourceTexture.Width,
-                    ((found.SpriteIndex * 8) / sourceTexture.Width) * 16,
+            sourceRect = new(((int)found.SpriteIndex * 8) % sourceTexture.Width,
+                    (((int)found.SpriteIndex * 8) / sourceTexture.Width) * 16,
                     8, 16);
         }
         else {
             sourceTexture = (coloredText ? SpriteText.coloredTexture : SpriteText.spriteTexture);
             sourceRect = (Rectangle)Method_getSourceRectForChar.Invoke(null, new object[] {c, junimoText});
         }
-        if ((found?.BaselineOffset ?? -1) >= 0) {
-            baselineOffset = poffset2f(found.BaselineOffset);
+        if ((found?.Baseline ?? -1) >= 0) {
+            baselineOffset = BaselineConvert((int)found.Baseline);
         }
         else {
-            baselineOffset = poffset2f(GetDefaultBaselineOffsetForChar(c, junimoText));
+            baselineOffset = BaselineConvert(GetDefaultBaselineForChar(c, junimoText));
         }
     }
 
-    internal static float poffset2f(int ypos)
+    internal static float BaselineConvert(int ypos)
     {
         return -4f + ypos;
     }
 
-    internal static int GetDefaultBaselineOffsetForChar(char c, bool junimoText)
+    internal static int GetDefaultBaselineForChar(char c, bool junimoText)
     {
         if (junimoText) {
             return 3;

@@ -26,21 +26,30 @@ internal sealed class Glyphs
 
 internal sealed class GlyphEntry
 {
-    public GridGlyph? Dialogue = null;
-    public GridGlyph? DialogueColored = null;
-    public GridGlyph? Junimo = null;
-    public int? BothSidesWidthOffset = null;
+    public BoldGlyph? Bold = null;
+    //public GridGlyph? Dialogue = null;
+    //public GridGlyph? DialogueColored = null;
+    //public GridGlyph? Junimo = null;
+    //public int? BoldSidesPadding = null;
     public AtlasGlyph? SmallFont = null;
     public AtlasGlyph? SpriteFont1 = null;
     public AtlasGlyph? TinyFont = null;
     public AtlasGlyph? OneX = null;
 }
 
+internal sealed class BoldGlyph
+{
+    public GridGlyph? Dialogue = null;
+    public GridGlyph? Colored = null;
+    public GridGlyph? Junimo = null;
+    public int? LeftRightPadding = null;
+}
+
 internal sealed class GridGlyph
 {
     public string? Texture = null;
-    public int SpriteIndex = -1;
-    public int BaselineOffset = -1;
+    public int? SpriteIndex = null;
+    public int? Baseline = null;
 }
 
 internal sealed class AtlasGlyph
