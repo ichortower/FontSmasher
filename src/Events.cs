@@ -32,9 +32,8 @@ internal class Events
             if (!SpriteFonts.PatchFont(fr, out string err)) {
                 Log.Warn($"Failed to patch font '{fr.DataFieldName}' " +
                         $"using provided glyph data: {err}");
-                break;
             }
-            SpriteFonts.TryGmcmRefUpdates(fr.DataFieldName);
+            break;
         }
     }
 

@@ -17,10 +17,6 @@ internal class Patches
     public static void Apply()
     {
         Harmony harmony = new(Main.ModId);
-        //PatchMethod(harmony, typeof(ClassToPatch),
-                //nameof(ClassToPatch.Method),
-                //new[]{typeof(arg1), ...}, // or null
-                //nameof(Patches.MethodToApply));
         PatchMethod(harmony, typeof(StardewValley.BellsAndWhistles.SpriteText),
                 nameof(StardewValley.BellsAndWhistles.SpriteText.getWidthOffsetForChar),
                 null,
@@ -53,20 +49,20 @@ internal class Patches
                 nameof(Patches.SpriteBatch_DrawString_Prefix));
     }
 
+
     internal static void SpriteBatch_DrawString_Prefix(
-            ref SpriteFont spriteFont)
+            SpriteFont spriteFont)
     {
+        // these look odd, but accessing the GlyphData objects triggers a load (synchronous),
+        // and when the load completes it fires AssetReady which patches the font in-place
         if (System.Object.ReferenceEquals(spriteFont, Game1.dialogueFont)) {
             _ = GlyphData.SpriteFont1;
-            spriteFont = Game1.dialogueFont;
         }
         else if (System.Object.ReferenceEquals(spriteFont, Game1.smallFont)) {
             _ = GlyphData.SmallFont;
-            spriteFont = Game1.smallFont;
         }
         else if (System.Object.ReferenceEquals(spriteFont, Game1.tinyFont)) {
             _ = GlyphData.TinyFont;
-            spriteFont = Game1.tinyFont;
         }
     }
 

@@ -18,13 +18,18 @@ internal sealed class SpriteFonts
     };
 
 
+    /*
+     * the procedure here is "unpack the data, edit it, and reconstruct the SpriteFont",
+     * since SpriteFont is hostile to editing.
+     * After reconstruction, an extension method actually replaces the data in the source
+     * font instead of replacing the reference, in order to preserve actual and potential
+     * cached references in other mods (e.g. GMCM)
+     */
     internal static bool PatchFont(FontRef fr, out string err)
     {
         // load from helper content manager since Game1.content's copy had its line spacing
         // altered after loading and the change persists in cache
         SpriteFont target = Main.instance.Helper.GameContent.Load<SpriteFont>(fr.GameAssetName);
-        // the procedure here is "unpack the data, edit it, and reconstruct the SpriteFont",
-        // since SpriteFont is hostile to editing
         List<PackItem> BoxesToPack = new();
         Dictionary<char, SpriteFont.Glyph> fontGlyphs = target.GetGlyphs();
         Dictionary<string, SpriteEntry> dataGlyphs = (Dictionary<string, SpriteEntry>)
@@ -145,6 +150,7 @@ internal sealed class SpriteFonts
             sb.End();
             Game1.graphics.GraphicsDevice.SetRenderTarget(savedTarget);
             sourceTex = render as Texture2D;
+            // FIXME remove this before release!
             using FileStream stream = File.OpenWrite("/home/ichortower/SpriteFont1.png");
             sourceTex.SaveAsPng(stream, sourceTex.Width, sourceTex.Height);
         }
@@ -161,35 +167,23 @@ internal sealed class SpriteFonts
             charList.Add(g.Character);
             bearingList.Add(new(g.LeftSideBearing, g.Width, g.RightSideBearing));
         }
-        // preserve Game1's mutated line spacings
-        int copiedSpacing = ((SpriteFont)fr.Game1Field.GetValue(Game1.game1)).LineSpacing;
+
+        SpriteFont gameFont = (SpriteFont)fr.Game1Field.GetValue(Game1.game1);
         SpriteFont recons = new(sourceTex,
                 boundsList,
                 containerList,
                 charList,
-                copiedSpacing,
+                gameFont.LineSpacing,
                 target.Spacing,
                 bearingList,
                 target.DefaultCharacter);
-        fr.Game1Field.SetValue(Game1.game1, recons);
+        // see Extensions.cs
+        gameFont.Snarf(recons);
 
         err = null;
         return true;
     }
 
-
-    /*
-     * This tries to pull up GMCM's assembly via the API, find the active menu,
-     * and swap out all of the cached references to Game1.dialogueFont and
-     * Game1.smallFont that SpaceShared (inexplicably) keeps on two of its
-     * widget types, preventing reloading from working without closing and
-     * reopening the menu.
-     *
-     * fieldName should be one of the DataFieldNames from the FontRef array.
-     */
-    internal static void TryGmcmRefUpdates(string fieldName)
-    {
-    }
 }
 
 internal sealed class FontRef

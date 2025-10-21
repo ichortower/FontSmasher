@@ -1,4 +1,3 @@
-using ContentPatcher;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -9,17 +8,6 @@ internal sealed class Main : Mod
 {
     public static Main instance;
     public static string ModId;
-
-    private static IContentPatcherAPI _cpapi = null;
-    internal static IContentPatcherAPI CPAPI {
-        get {
-            if (_cpapi is null) {
-                _cpapi = Main.instance.Helper.ModRegistry.GetApi
-                        <IContentPatcherAPI>("Pathoschild.ContentPatcher");
-            }
-            return _cpapi;
-        }
-    }
 
     public override void Entry(IModHelper helper)
     {

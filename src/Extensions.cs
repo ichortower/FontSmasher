@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using SpriteFont = Microsoft.Xna.Framework.Graphics.SpriteFont;
 
 namespace ichortower.FontSmasher;
 
@@ -56,7 +57,10 @@ internal static class CodeMatcherExtensions
         CodeMatcher finder = cm.Clone().MatchStartForward(matches);
         return cm.RemoveInstructionsInRange(originalPos, finder.Pos - 1);
     }
+}
 
+internal static class RectangleExtensions
+{
     /*
      * Scale a rectangle by an integer percentage.
      */
@@ -64,5 +68,30 @@ internal static class CodeMatcherExtensions
     {
         return new Rectangle(rect.X * percent / 100, rect.Y * percent / 100,
                 rect.Width * percent / 100, rect.Height * percent / 100);
+    }
+}
+
+
+internal static class SpriteFontExtensions
+{
+    static PropertyInfo CharactersProp = typeof(SpriteFont).GetProperty(
+            nameof(SpriteFont.Characters),
+            BindingFlags.Public | BindingFlags.Instance);
+    static FieldInfo GlyphsField = typeof(SpriteFont).GetField("_glyphs",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+    static FieldInfo RegionsField = typeof(SpriteFont).GetField("_regions",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+    static FieldInfo TextureField = typeof(SpriteFont).GetField("_texture",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+    /*
+     * Replace the data in a SpriteFont by copying it from another.
+     * Not a good idea (reflection crimes!), but better than the alternatives.
+     */
+    public static void Snarf(this SpriteFont self, SpriteFont other)
+    {
+        CharactersProp.SetValue(self, other.Characters);
+        GlyphsField.SetValue(self, other.Glyphs);
+        RegionsField.SetValue(self, RegionsField.GetValue(other));
+        TextureField.SetValue(self, other.Texture);
     }
 }
