@@ -4,87 +4,130 @@ using System.Collections.Generic;
 
 namespace ichortower.FontSmasher;
 
-internal sealed class Glyphs
+internal sealed class GlyphData
 {
-    internal static string DataAsset = $"{Main.ModId}/Glyphs";
+    internal static string BoldFontAsset = $"{Main.ModId}/BoldFont";
+    internal static string SpriteFont1Asset = $"{Main.ModId}/SpriteFont1";
+    internal static string SmallFontAsset = $"{Main.ModId}/SmallFont";
+    internal static string TinyFontAsset = $"{Main.ModId}/TinyFont";
 
-    private static Dictionary<char, GlyphEntry> _Data = null;
-    public static Dictionary<char, GlyphEntry> Data {
+    private static Dictionary<string, BoldEntry> _BoldFontData = null;
+    private static Dictionary<string, SpriteEntry> _SpriteFont1Data = null;
+    private static Dictionary<string, SpriteEntry> _SmallFontData = null;
+    private static Dictionary<string, SpriteEntry> _TinyFontData = null;
+
+    public static Dictionary<string, BoldEntry> BoldFont {
         get {
-            if (_Data is null) {
-                _Data = Game1.content.Load<Dictionary<char, GlyphEntry>>(DataAsset);
+            if (_BoldFontData is null) {
+                _BoldFontData = Game1.content.Load
+                        <Dictionary<string, BoldEntry>>(BoldFontAsset);
             }
-            return _Data;
+            return _BoldFontData;
         }
         set {
-            _Data = value;
+            _BoldFontData = value;
         }
+    }
+
+    public static Dictionary<string, SpriteEntry> SpriteFont1 {
+        get {
+            if (_SpriteFont1Data is null) {
+                _SpriteFont1Data = Game1.content.Load
+                    <Dictionary<string, SpriteEntry>>(SpriteFont1Asset);
+            }
+            return _SpriteFont1Data;
+        }
+        set {
+            _SpriteFont1Data = value;
+        }
+    }
+
+    public static Dictionary<string, SpriteEntry> SmallFont {
+        get {
+            if (_SmallFontData is null) {
+                _SmallFontData = Game1.content.Load
+                    <Dictionary<string, SpriteEntry>>(SmallFontAsset);
+            }
+            return _SmallFontData;
+        }
+        set {
+            _SmallFontData = value;
+        }
+    }
+
+    public static Dictionary<string, SpriteEntry> TinyFont {
+        get {
+            if (_TinyFontData is null) {
+                _TinyFontData = Game1.content.Load
+                    <Dictionary<string, SpriteEntry>>(TinyFontAsset);
+            }
+            return _TinyFontData;
+        }
+        set {
+            _TinyFontData = value;
+        }
+    }
+
+    public static string GetKey(char c) {
+        if (c == ' ') {
+            return "<Space>";
+        }
+        return c.ToString();
+    }
+
+    public static char GetReverseKey(string s) {
+        if (s == "<Space>") {
+            return ' ';
+        }
+        return s[0];
     }
 }
 
+
 #nullable enable
 
-internal sealed class GlyphEntry
+internal sealed class BoldEntry
 {
-    public BoldGlyph? Bold = null;
-    //public GridGlyph? Dialogue = null;
-    //public GridGlyph? DialogueColored = null;
-    //public GridGlyph? Junimo = null;
-    //public int? BoldSidesPadding = null;
-    public AtlasGlyph? SmallFont = null;
-    public AtlasGlyph? SpriteFont1 = null;
-    public AtlasGlyph? TinyFont = null;
-    public AtlasGlyph? OneX = null;
-}
-
-internal sealed class BoldGlyph
-{
-    public GridGlyph? Dialogue = null;
-    public GridGlyph? Colored = null;
-    public GridGlyph? Junimo = null;
+    public BoldGlyph? Dialogue = null;
+    public BoldGlyph? Colored = null;
+    public BoldGlyph? Junimo = null;
     public int? LeftRightPadding = null;
 }
 
-internal sealed class GridGlyph
+internal sealed class BoldGlyph
 {
     public string? Texture = null;
     public int? SpriteIndex = null;
     public int? Baseline = null;
 }
 
-internal sealed class AtlasGlyph
+internal sealed class SpriteEntry
 {
     public string? Texture = null;
-    public MetricsSource? CopyMetrics = null;
+    public int? ScaleMetrics = null; 
     public Rectangle? SourceRect = null;
-    public GlyphPadding? Padding = null;
+    public SpritePadding? Padding = null;
     public int? AboveBaseline = null;
     public int? BelowBaseline = null;
     public float? LeftSideBearing = null;
     public float? RightSideBearing = null;
 }
 
-internal sealed class GlyphPadding
+internal sealed class SpritePadding
 {
     public int? Left = null;
     public int? Right = null;
     public int? Top = null;
     public int? Bottom = null;
 
-    public GlyphPadding Scale(int percent) {
-        return new GlyphPadding() {
+    public SpritePadding Scale(int percent) {
+        return new SpritePadding() {
             Left = this.Left * percent / 100,
             Right = this.Right * percent / 100,
             Top = this.Top * percent / 100,
             Bottom = this.Bottom * percent / 100,
         };
     }
-}
-
-internal sealed class MetricsSource
-{
-    public string Source = "OneX";
-    public int Scale = 100;
 }
 
 #nullable disable

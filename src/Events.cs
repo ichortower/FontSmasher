@@ -3,6 +3,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ichortower.FontSmasher;
 
@@ -10,37 +11,53 @@ internal class Events
 {
     public static void OnAssetRequested(object sender, AssetRequestedEventArgs e)
     {
-        if (e.Name.IsEquivalentTo(Glyphs.DataAsset)) {
+        if (e.Name.IsEquivalentTo(GlyphData.BoldFontAsset)) {
             e.LoadFrom(() => {
-                return new Dictionary<char, GlyphEntry>();
+                return new Dictionary<string, BoldEntry>();
+            }, AssetLoadPriority.Exclusive);
+        }
+        else if (SpriteFonts.GameFonts.Any(a => e.Name.IsEquivalentTo(a.DataAssetName))) {
+            e.LoadFrom(() => {
+                return new Dictionary<string, SpriteEntry>();
             }, AssetLoadPriority.Exclusive);
         }
     }
 
     public static void OnAssetReady(object sender, AssetReadyEventArgs e)
     {
-        if (e.Name.IsEquivalentTo(Glyphs.DataAsset)) {
-            SpriteFonts.PatchIn();
+        foreach (FontRef fr in SpriteFonts.GameFonts) {
+            if (!e.Name.IsEquivalentTo(fr.DataAssetName)) {
+                continue;
+            }
+            if (!SpriteFonts.PatchFont(fr, out string err)) {
+                Log.Warn($"Failed to patch font '{fr.DataFieldName}' " +
+                        $"using provided glyph data: {err}");
+                break;
+            }
+            SpriteFonts.TryGmcmRefUpdates(fr.DataFieldName);
         }
     }
 
     public static void OnAssetsInvalidated(object sender, AssetsInvalidatedEventArgs e)
     {
         foreach (var name in e.Names) {
-            if (name.IsEquivalentTo(Glyphs.DataAsset)) {
-                Log.Trace("Invalidating cache");
-                Glyphs.Data = null;
+            if (name.IsEquivalentTo(GlyphData.BoldFontAsset)) {
+                GlyphData.BoldFont = null;
+            }
+            else if (name.IsEquivalentTo(GlyphData.SpriteFont1Asset)) {
+                GlyphData.SpriteFont1 = null;
+            }
+            else if (name.IsEquivalentTo(GlyphData.SmallFontAsset)) {
+                GlyphData.SmallFont = null;
+            }
+            else if (name.IsEquivalentTo(GlyphData.TinyFontAsset)) {
+                GlyphData.TinyFont = null;
             }
         }
     }
 
     public static void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
     {
-        if (!Main.CPAPI.IsConditionsApiReady) {
-            return;
-        }
-        _ = Glyphs.Data;
-        Main.instance.Helper.Events.GameLoop.UpdateTicked -= Events.OnUpdateTicked;
     }
 
     public static void OnGameLaunched(object sender, GameLaunchedEventArgs e)

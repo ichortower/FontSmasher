@@ -11,108 +11,59 @@ namespace ichortower.FontSmasher;
 
 internal sealed class SpriteFonts
 {
-    /*
-     * Keep these arrays in sync, except note that DataFieldNames has the special extra value
-     * 'OneX', which is not parsed on its own but serves only as a 1x source for CopyMetrics
-     */
-    internal static FieldInfo[] FontFields = new [] {
-        typeof(Game1).GetField(nameof(Game1.dialogueFont),
-                BindingFlags.Public | BindingFlags.Static),
-        typeof(Game1).GetField(nameof(Game1.smallFont),
-                BindingFlags.Public | BindingFlags.Static),
-        typeof(Game1).GetField(nameof(Game1.tinyFont),
-                BindingFlags.Public | BindingFlags.Static),
+    internal static FontRef[] GameFonts = new FontRef[] {
+        new("Fonts/SpriteFont1", GlyphData.SpriteFont1Asset, nameof(Game1.dialogueFont), 36),
+        new("Fonts/SmallFont", GlyphData.SmallFontAsset, nameof(Game1.smallFont), 24),
+        new("Fonts/TinyFont", GlyphData.TinyFontAsset, nameof(Game1.tinyFont), 21),
     };
-    internal static string[] AssetNames = new [] {
-        "Fonts/SpriteFont1",
-        "Fonts/SmallFont",
-        "Fonts/tinyFont",
-    };
-    internal static int[] Baselines = new [] {
-        36,
-        24,
-        21,
-    };
-    internal static string[] DataFieldNames = new [] {
-        nameof(GlyphEntry.SpriteFont1),
-        nameof(GlyphEntry.SmallFont),
-        nameof(GlyphEntry.TinyFont),
-        nameof(GlyphEntry.OneX),
-    };
-    // this array is automatic tho
-    internal static FieldInfo[] DataFields = DataFieldNames.Select((name) => {
-        return typeof(GlyphEntry).GetField(name,
-                BindingFlags.Public | BindingFlags.Instance);
-    }).ToArray();
 
-    public static void PatchIn()
-    {
-        for (int i = 0; i < FontFields.Length; ++i) {
-            if (!PatchFont(i, out string err)) {
-                Log.Warn($"Failed to patch font '{DataFields[i].Name}' " +
-                        $"using provided glyph data: {err}");
-            }
-        }
-    }
 
-    internal static bool PatchFont(int index, out string err)
+    internal static bool PatchFont(FontRef fr, out string err)
     {
         // load from helper content manager since Game1.content's copy had its line spacing
         // altered after loading and the change persists in cache
-        SpriteFont target = Main.instance.Helper.GameContent.Load<SpriteFont>(AssetNames[index]);
-        string fontName = DataFields[index].Name;
+        SpriteFont target = Main.instance.Helper.GameContent.Load<SpriteFont>(fr.GameAssetName);
         // the procedure here is "unpack the data, edit it, and reconstruct the SpriteFont",
         // since SpriteFont is hostile to editing
         List<PackItem> BoxesToPack = new();
         Dictionary<char, SpriteFont.Glyph> fontGlyphs = target.GetGlyphs();
-        foreach (var kvp in Glyphs.Data) {
-            GlyphEntry entry = kvp.Value;
-            AtlasGlyph which = (AtlasGlyph)DataFields[index].GetValue(entry);
+        Dictionary<string, SpriteEntry> dataGlyphs = (Dictionary<string, SpriteEntry>)
+                fr.GlyphDataProperty.GetValue(null);
+        foreach (var kvp in dataGlyphs) {
+            SpriteEntry which = kvp.Value;
             if (which is null) {
                 continue;
             }
-            if (!fontGlyphs.TryGetValue(kvp.Key, out SpriteFont.Glyph glyph)) {
+            char chKey = GlyphData.GetReverseKey(kvp.Key);
+            if (!fontGlyphs.TryGetValue(chKey, out SpriteFont.Glyph glyph)) {
                 if (which.SourceRect is null) {
-                    Log.Warn($"For glyph '{kvp.Key}' ({fontName}): this glyph was not already " +
-                            "present in the font, but the required field 'SourceRect' " +
-                            "was not specified. Skipping this glyph.");
+                    Log.Warn($"For glyph '{kvp.Key}' ({fr.DataFieldName}): this glyph " +
+                            "was not already present in the font, but the required field " +
+                            "'SourceRect' was not specified. Skipping this glyph.");
                     continue;
                 }
                 glyph = new SpriteFont.Glyph() {
-                    Character = kvp.Key,
+                    Character = chKey,
                 };
             }
 
-            // sub out our source for numerical stuff if needed, but leave texture alone
-            if (which.CopyMetrics is not null) {
-                try {
-                    int i = Array.IndexOf(DataFieldNames, which.CopyMetrics.Source);
-                    AtlasGlyph fromObj = (AtlasGlyph)DataFields[i].GetValue(entry);
-                    if (fromObj.LeftSideBearing is not null) {
-                        which.LeftSideBearing = fromObj.LeftSideBearing *
-                                which.CopyMetrics.Scale / 100;
-                    }
-                    if (fromObj.RightSideBearing is not null) {
-                        which.RightSideBearing = fromObj.RightSideBearing *
-                                which.CopyMetrics.Scale / 100;
-                    }
-                    if (fromObj.AboveBaseline is not null) {
-                        which.AboveBaseline = fromObj.AboveBaseline *
-                                which.CopyMetrics.Scale / 100;
-                    }
-                    else if (fromObj.BelowBaseline is not null) {
-                        which.BelowBaseline = fromObj.BelowBaseline *
-                                which.CopyMetrics.Scale / 100;
-                    }
-                    which.SourceRect = fromObj.SourceRect?.Scale(which.CopyMetrics.Scale);
-                    which.Padding = fromObj.Padding?.Scale(which.CopyMetrics.Scale);
+            // scalemetrics goes here
+            if (which.ScaleMetrics is not null) {
+                int scale = which?.ScaleMetrics ?? 100;
+                if (which.LeftSideBearing is not null) {
+                    which.LeftSideBearing = which.LeftSideBearing * scale / 100;
                 }
-                catch (Exception e) {
-                    Log.Warn($"For glyph '{kvp.Key}' ({fontName}): this glyph failed to " +
-                            $"copy metrics from target '{which.CopyMetrics.Source}'. " +
-                            $"Skipping this glyph. {e}");
-                    continue;
+                if (which.RightSideBearing is not null) {
+                    which.RightSideBearing = which.RightSideBearing * scale / 100;
                 }
+                if (which.AboveBaseline is not null) {
+                    which.AboveBaseline = which.AboveBaseline * scale / 100;
+                }
+                if (which.BelowBaseline is not null) {
+                    which.BelowBaseline = which.BelowBaseline * scale / 100;
+                }
+                which.SourceRect = which.SourceRect?.Scale(scale);
+                which.Padding = which.Padding?.Scale(scale);
             }
 
             if (which.LeftSideBearing is not null) {
@@ -128,11 +79,11 @@ internal sealed class SpriteFonts
                 // this 16 is bad but it shouldn't be possible to fall back to it
                 glyph.Width = which.SourceRect?.Width ?? 16f;
             }
-            GlyphPadding padding = which.Padding ?? new();
+            SpritePadding padding = which.Padding ?? new();
             // honor padding.top if given, but otherwise default to on-baseline
             if (which.Padding?.Top is null) {
                 int dist = (which.AboveBaseline ?? (-1 * (which.BelowBaseline ?? 0)));
-                padding.Top = Baselines[index] - dist - glyph.BoundsInTexture.Height;
+                padding.Top = fr.Baseline - dist - glyph.BoundsInTexture.Height;
             }
             int fullHeight = padding.Top ?? 0 + padding.Bottom ?? 0 + glyph.BoundsInTexture.Height;
             glyph.Cropping = new Rectangle(padding.Left ?? 0, padding.Top ?? 0,
@@ -144,13 +95,13 @@ internal sealed class SpriteFonts
             // texture check comes at the end since sourcerect may or may not be in our data
             if (which.Texture is not null) {
                 BoxesToPack.Add(new PackItem() {
-                    Character = kvp.Key,
+                    Character = chKey,
                     Texture = which.Texture,
                     Bounds = glyph.BoundsInTexture
                 });
             }
 
-            fontGlyphs[kvp.Key] = glyph;
+            fontGlyphs[chKey] = glyph;
         }
 
         Texture2D sourceTex = target.Texture;
@@ -189,6 +140,7 @@ internal sealed class SpriteFonts
                 SpriteFont.Glyph temp = fontGlyphs[item.Character];
                 temp.BoundsInTexture = item.Bounds;
                 fontGlyphs[item.Character] = temp;
+                Log.Info(temp.ToString());
             }
             sb.End();
             Game1.graphics.GraphicsDevice.SetRenderTarget(savedTarget);
@@ -210,7 +162,7 @@ internal sealed class SpriteFonts
             bearingList.Add(new(g.LeftSideBearing, g.Width, g.RightSideBearing));
         }
         // preserve Game1's mutated line spacings
-        int copiedSpacing = ((SpriteFont)FontFields[index].GetValue(Game1.game1)).LineSpacing;
+        int copiedSpacing = ((SpriteFont)fr.Game1Field.GetValue(Game1.game1)).LineSpacing;
         SpriteFont recons = new(sourceTex,
                 boundsList,
                 containerList,
@@ -219,9 +171,44 @@ internal sealed class SpriteFonts
                 target.Spacing,
                 bearingList,
                 target.DefaultCharacter);
-        FontFields[index].SetValue(Game1.game1, recons);
+        fr.Game1Field.SetValue(Game1.game1, recons);
 
         err = null;
         return true;
+    }
+
+
+    /*
+     * This tries to pull up GMCM's assembly via the API, find the active menu,
+     * and swap out all of the cached references to Game1.dialogueFont and
+     * Game1.smallFont that SpaceShared (inexplicably) keeps on two of its
+     * widget types, preventing reloading from working without closing and
+     * reopening the menu.
+     *
+     * fieldName should be one of the DataFieldNames from the FontRef array.
+     */
+    internal static void TryGmcmRefUpdates(string fieldName)
+    {
+    }
+}
+
+internal sealed class FontRef
+{
+    public string GameAssetName;
+    public string DataAssetName;
+    public string DataFieldName;
+    public int Baseline;
+    public FieldInfo Game1Field;
+    public PropertyInfo GlyphDataProperty;
+
+    public FontRef(string gameAsset, string dataAsset, string fontFieldName, int baseline) {
+        GameAssetName = gameAsset;
+        DataAssetName = dataAsset;
+        Baseline = baseline;
+        DataFieldName = Path.GetFileName(dataAsset);
+        Game1Field = typeof(Game1).GetField(fontFieldName,
+                BindingFlags.Public | BindingFlags.Static);
+        GlyphDataProperty = typeof(GlyphData).GetProperty(DataFieldName,
+                BindingFlags.Public | BindingFlags.Static);
     }
 }

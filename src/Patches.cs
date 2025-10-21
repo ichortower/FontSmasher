@@ -54,26 +54,18 @@ internal class Patches
     }
 
     internal static void SpriteBatch_DrawString_Prefix(
-            SpriteFont spriteFont)
+            ref SpriteFont spriteFont)
     {
-        int i = -1;
         if (System.Object.ReferenceEquals(spriteFont, Game1.dialogueFont)) {
-            i = 0;
-        }
-        else if (System.Object.ReferenceEquals(spriteFont, Game1.smallFont)) {
-            i = 1;
-        }
-        else if (System.Object.ReferenceEquals(spriteFont, Game1.tinyFont)) {
-            i = 2;
-        }
-        _ = Glyphs.Data;
-        if (i == 0) {
+            _ = GlyphData.SpriteFont1;
             spriteFont = Game1.dialogueFont;
         }
-        else if (i == 1) {
+        else if (System.Object.ReferenceEquals(spriteFont, Game1.smallFont)) {
+            _ = GlyphData.SmallFont;
             spriteFont = Game1.smallFont;
         }
-        else if (i == 2) {
+        else if (System.Object.ReferenceEquals(spriteFont, Game1.tinyFont)) {
+            _ = GlyphData.TinyFont;
             spriteFont = Game1.tinyFont;
         }
     }
@@ -81,31 +73,10 @@ internal class Patches
     internal static void SpriteText_getWidthOffsetForChar_Postfix(
             char c, ref int __result)
     {
-        if (Glyphs.Data.TryGetValue(c, out var val) &&
-                (val?.Bold?.LeftRightPadding ?? -1) >= 0) {
-            __result = -1 * (int)val.Bold.LeftRightPadding;
+        if (GlyphData.BoldFont.TryGetValue(GlyphData.GetKey(c), out var val) &&
+                (val?.LeftRightPadding ?? -1) >= 0) {
+            __result = -1 * (int)val.LeftRightPadding;
         }
-        /*
-        if (!Main.Config.ReplaceVanillaDialogueFont) {
-            return;
-        }
-        // covered by base function:
-        // -1: !¡ş
-        // -2: .,
-        //
-        // the second line of each of these strings is for cyrillic letters. the "duplicates"
-        // appearing there are distinct from the identical latin ones
-        string minus1 = "aàáâãäåąbcçćdeèéêëęfgğhknñńoòóôõöőpqrsśtuùúûüűvxyýÿzźżðþ0123456789 ?¿()|:;-\"/\\" +
-                "абвгґдеёзийклнопрстуўхчъьэєя";
-        string minus2 = "iìíîïıjlł'’ᵃᵒ" +
-                "ії";
-        if (minus1.IndexOf(c) != -1) {
-            __result = -1;
-        }
-        else if (minus2.IndexOf(c) != -1) {
-            __result = -2;
-        }
-        */
     }
 
     private static MethodInfo _mgsrfc = null;
@@ -190,19 +161,19 @@ internal class Patches
     internal static void GetSourceForChar(char c, bool coloredText, bool junimoText,
             out Texture2D sourceTexture, out Rectangle sourceRect, out float baselineOffset)
     {
-        GridGlyph found = null;
-        if (Glyphs.Data.TryGetValue(c, out var entry)) {
-            if (coloredText && entry?.Bold?.Colored is not null) {
-                found = entry.Bold.Colored;
+        BoldGlyph found = null;
+        if (GlyphData.BoldFont.TryGetValue(GlyphData.GetKey(c), out var entry)) {
+            if (coloredText && entry?.Colored is not null) {
+                found = entry.Colored;
             }
-            else if (junimoText && entry?.Bold?.Junimo is not null) {
-                found = entry.Bold.Junimo;
+            else if (junimoText && entry?.Junimo is not null) {
+                found = entry.Junimo;
             }
-            else if (entry?.Bold?.Dialogue is not null) {
-                found = entry.Bold.Dialogue;
+            else if (entry?.Dialogue is not null) {
+                found = entry.Dialogue;
             }
         }
-        
+
         if (found?.Texture is not null && (found?.SpriteIndex ?? -1) >= 0) {
             sourceTexture = Game1.content.Load<Texture2D>(found.Texture);
             sourceRect = new(((int)found.SpriteIndex * 8) % sourceTexture.Width,
@@ -213,6 +184,7 @@ internal class Patches
             sourceTexture = (coloredText ? SpriteText.coloredTexture : SpriteText.spriteTexture);
             sourceRect = (Rectangle)Method_getSourceRectForChar.Invoke(null, new object[] {c, junimoText});
         }
+
         if ((found?.Baseline ?? -1) >= 0) {
             baselineOffset = BaselineConvert((int)found.Baseline);
         }

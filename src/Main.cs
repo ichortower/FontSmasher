@@ -29,7 +29,7 @@ internal sealed class Main : Mod
         helper.Events.Content.AssetRequested += Events.OnAssetRequested;
         helper.Events.Content.AssetReady += Events.OnAssetReady;
         helper.Events.Content.AssetsInvalidated += Events.OnAssetsInvalidated;
-        helper.Events.GameLoop.UpdateTicked += Events.OnUpdateTicked;
+        //helper.Events.GameLoop.UpdateTicked += Events.OnUpdateTicked;
         //helper.Events.GameLoop.DayStarted += Events.OnDayStarted;
         //helper.Events.GameLoop.ReturnedToTitle += Events.OnReturnedToTitle;
 
