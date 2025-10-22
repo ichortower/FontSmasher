@@ -14,7 +14,7 @@ internal sealed class SpriteFonts
     internal static FontRef[] GameFonts = new FontRef[] {
         new("Fonts/SpriteFont1", GlyphData.SpriteFont1Asset, nameof(Game1.dialogueFont), 36),
         new("Fonts/SmallFont", GlyphData.SmallFontAsset, nameof(Game1.smallFont), 24),
-        new("Fonts/TinyFont", GlyphData.TinyFontAsset, nameof(Game1.tinyFont), 21),
+        new("Fonts/tinyFont", GlyphData.TinyFontAsset, nameof(Game1.tinyFont), 21),
     };
 
 
@@ -111,7 +111,8 @@ internal sealed class SpriteFonts
 
         Texture2D sourceTex = target.Texture;
         if (BoxesToPack.Count > 0) {
-            List<PackItem> packed = BoxPacker.Pack(BoxesToPack, out Rectangle size);
+            List<PackItem> packed = BoxPacker.Pack(BoxesToPack,
+                    sourceTex.Width, out Rectangle size);
             RenderTarget2D render = new(Game1.graphics.GraphicsDevice,
                     Math.Max(sourceTex.Width, size.Width),
                     sourceTex.Height + size.Height);
@@ -145,13 +146,14 @@ internal sealed class SpriteFonts
                 SpriteFont.Glyph temp = fontGlyphs[item.Character];
                 temp.BoundsInTexture = item.Bounds;
                 fontGlyphs[item.Character] = temp;
-                Log.Info(temp.ToString());
             }
             sb.End();
             Game1.graphics.GraphicsDevice.SetRenderTarget(savedTarget);
             sourceTex = render as Texture2D;
+
             // FIXME remove this before release!
-            using FileStream stream = File.OpenWrite("/home/ichortower/SpriteFont1.png");
+            using FileStream stream = File.OpenWrite(
+                    $"/home/ichortower/{fr.DataFieldName}.png");
             sourceTex.SaveAsPng(stream, sourceTex.Width, sourceTex.Height);
         }
 

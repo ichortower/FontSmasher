@@ -10,16 +10,20 @@ internal sealed class BoxPacker
 {
     /*
      */
-    public static List<PackItem> Pack(List<PackItem> input, out Rectangle bounds)
+    public static List<PackItem> Pack(List<PackItem> input, int width, out Rectangle bounds)
     {
+        bounds = Rectangle.Empty;
         // b - a is descending order (i have to write this down because it's impossible to remember)
-        input.Sort((a, b) => b.Bounds.Width * b.Bounds.Height - a.Bounds.Width * a.Bounds.Height);
-        // try 256 width first. increase and try again if too tall, until not too tall
-        // disclosure: I expect 256 to suffice for most uses of this mod
-        for (int maxWidth = 256; ; maxWidth += 256) {
-            bounds = Rectangle.Empty;
+        input.Sort((a, b) => {
+            int hd = b.Bounds.Height - a.Bounds.Height;
+            int wd = b.Bounds.Width - a.Bounds.Width;
+            return hd != 0 ? hd : wd;
+        });//b.Bounds.Width * b.Bounds.Height - a.Bounds.Width * a.Bounds.Height);
+        // start with a square; increase height by width and try again if no room.
+        // generally expect caller (me!) to provide a sane width value
+        for (int i = 0; ; ++i) {
             List<PackItem> ret = new();
-            List<Rectangle> freeSpaces = new() { new(0, 0, maxWidth, maxWidth) };
+            List<Rectangle> freeSpaces = new() { new(0, 0, width, width*(i+1)) };
             foreach (PackItem item in input) {
                 Rectangle found = ClaimSpace(item.Bounds, ref freeSpaces);
                 if (found == Rectangle.Empty) {
@@ -27,7 +31,7 @@ internal sealed class BoxPacker
                     bounds = Rectangle.Empty;
                     break;
                 }
-                Log.Info($"Packing rect {item.Bounds} into {found}");
+                Log.Info($"'{item.Character}': packing {item.Bounds} into {found}");
                 ret.Add(new PackItem() {
                     Character = item.Character,
                     Texture = item.Texture,
@@ -38,9 +42,9 @@ internal sealed class BoxPacker
                 bounds.Height = Math.Max(bounds.Height, found.Bottom);
             }
 
-            //if (bounds.Height < bounds.Width) {
+            if (bounds != Rectangle.Empty) {
                 return ret;
-            //}
+            }
         }
     }
 
@@ -54,16 +58,18 @@ internal sealed class BoxPacker
                 continue;
             }
             ret = new(spaces[i].X, spaces[i].Y, item.Width, item.Height);
+            // exactly fits the space: just remove it
             if (item.Width == spaces[i].Width && item.Height == spaces[i].Height) {
                 spaces.RemoveAt(i);
                 return ret;
             }
+            // fits in exactly one dimension: trim but don't remove
             // the temp assigners are required because xna Rectangle is a struct and
             // something something intermediate copies
             if (item.Width == spaces[i].Width) {
                 Rectangle temp = spaces[i];
                 temp.Y = ret.Bottom;
-                temp.Height = item.Height;
+                temp.Height -= item.Height;
                 spaces[i] = temp;
                 return ret;
             }
@@ -75,20 +81,21 @@ internal sealed class BoxPacker
                 return ret;
             }
             // standard result: smaller in both dimensions
-            // split to maximize the big box and let the small one be small. then insert the
-            // small one second at the same index, so it comes first for the next item
+            // since we want to pack across rows when possible, always split so the small
+            // box is to the right: short and wide
+            // insert the small one second at the same index, so it comes first next time
             int freeW = spaces[i].Width - item.Width;
             int freeH = spaces[i].Height - item.Height;
             Rectangle smallBox;
             Rectangle bigBox;
-            if (freeW > freeH) {
-                bigBox = new(ret.Right, spaces[i].Y, freeW, spaces[i].Height);
-                smallBox = new(spaces[i].X, ret.Bottom, ret.Width, freeH);
-            }
-            else {
+            //if (freeW > freeH) {
+                //bigBox = new(ret.Right, spaces[i].Y, freeW, spaces[i].Height);
+                //smallBox = new(spaces[i].X, ret.Bottom, ret.Width, freeH);
+            //}
+            //else {
                 bigBox = new(spaces[i].X, ret.Bottom, spaces[i].Width, freeH);
                 smallBox = new(ret.Right, spaces[i].Y, freeW, ret.Height);
-            }
+            //}
             spaces.RemoveAt(i);
             spaces.Insert(i, bigBox);
             spaces.Insert(i, smallBox);
