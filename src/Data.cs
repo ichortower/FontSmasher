@@ -72,12 +72,18 @@ internal sealed class GlyphData
         if (c == ' ') {
             return "<Space>";
         }
+        else if (c == ' ') {
+            return "<Nbsp>";
+        }
         return c.ToString();
     }
 
     public static char GetReverseKey(string s) {
         if (s == "<Space>") {
             return ' ';
+        }
+        else if (s == "<Nbsp>") {
+            return ' ';
         }
         return s[0];
     }
