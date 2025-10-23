@@ -18,7 +18,7 @@ internal sealed class BoxPacker
             int hd = b.Bounds.Height - a.Bounds.Height;
             int wd = b.Bounds.Width - a.Bounds.Width;
             return hd != 0 ? hd : wd;
-        });//b.Bounds.Width * b.Bounds.Height - a.Bounds.Width * a.Bounds.Height);
+        });
         // start with a square; increase height by width and try again if no room.
         // generally expect caller (me!) to provide a sane width value
         for (int i = 0; ; ++i) {
@@ -31,7 +31,6 @@ internal sealed class BoxPacker
                     bounds = Rectangle.Empty;
                     break;
                 }
-                Log.Info($"'{item.Character}': packing {item.Bounds} into {found}");
                 ret.Add(new PackItem() {
                     Character = item.Character,
                     Texture = item.Texture,

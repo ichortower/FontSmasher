@@ -32,6 +32,12 @@ internal sealed class SpriteFonts
         SpriteFont target = Main.instance.Helper.GameContent.Load<SpriteFont>(fr.GameAssetName);
         List<PackItem> BoxesToPack = new();
         Dictionary<char, SpriteFont.Glyph> fontGlyphs = target.GetGlyphs();
+        // try to use the baseline calculated from 'A', which should be sitting on it.
+        // this gets used to auto-align patch glyphs and calculate a scale (if not provided).
+        int useBaseline = fr.Baseline;
+        if (fontGlyphs.TryGetValue('A', out SpriteFont.Glyph gA)) {
+            useBaseline = gA.BoundsInTexture.Height + gA.Cropping.Y;
+        }
         Dictionary<string, SpriteEntry> dataGlyphs = (Dictionary<string, SpriteEntry>)
                 fr.GlyphDataProperty.GetValue(null);
         foreach (var kvp in dataGlyphs) {
@@ -52,7 +58,6 @@ internal sealed class SpriteFonts
                 };
             }
 
-            // scalemetrics goes here
             if (which.ScaleMetrics is not null) {
                 int scale = which?.ScaleMetrics ?? 100;
                 if (which.LeftSideBearing is not null) {
@@ -88,7 +93,7 @@ internal sealed class SpriteFonts
             // honor padding.top if given, but otherwise default to on-baseline
             if (which.Padding?.Top is null) {
                 int dist = (which.AboveBaseline ?? (-1 * (which.BelowBaseline ?? 0)));
-                padding.Top = fr.Baseline - dist - glyph.BoundsInTexture.Height;
+                padding.Top = useBaseline - dist - glyph.BoundsInTexture.Height;
             }
             int fullHeight = padding.Top ?? 0 + padding.Bottom ?? 0 + glyph.BoundsInTexture.Height;
             glyph.Cropping = new Rectangle(padding.Left ?? 0, padding.Top ?? 0,
