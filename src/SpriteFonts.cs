@@ -30,17 +30,24 @@ internal sealed class SpriteFonts
         // load from helper content manager since Game1.content's copy had its line spacing
         // altered after loading and the change persists in cache
         SpriteFont target = Main.instance.Helper.GameContent.Load<SpriteFont>(fr.GameAssetName);
-        List<PackItem> BoxesToPack = new();
+        SpriteFontPatchData modData = (SpriteFontPatchData)fr.GlyphDataProperty.GetValue(null);
         Dictionary<char, SpriteFont.Glyph> fontGlyphs = target.GetGlyphs();
-        // try to use the baseline calculated from 'A', which should be sitting on it.
-        // this gets used to auto-align patch glyphs and calculate a scale (if not provided).
-        int useBaseline = fr.Baseline;
-        if (fontGlyphs.TryGetValue('A', out SpriteFont.Glyph gA)) {
-            useBaseline = gA.BoundsInTexture.Height + gA.Cropping.Y;
+        int lineSpacing = modData.Metrics?.LineSpacing ?? target.LineSpacing;
+        List<PackItem> BoxesToPack = new();
+
+        int useBaseline = modData.Metrics?.Baseline ?? -1;
+        if (useBaseline == -1) {
+            // get the baseline from 'A', which should be sitting on it
+            if (fontGlyphs.TryGetValue('A', out SpriteFont.Glyph gA)) {
+                useBaseline = gA.BoundsInTexture.Height + gA.Cropping.Y;
+            }
+            else {
+                err = $"Can't find baseline ('A' glyph is missing!)";
+                return false;
+            }
         }
-        Dictionary<string, SpriteEntry> dataGlyphs = (Dictionary<string, SpriteEntry>)
-                fr.GlyphDataProperty.GetValue(null);
-        foreach (var kvp in dataGlyphs) {
+
+        foreach (var kvp in modData.Glyphs) {
             SpriteEntry which = kvp.Value;
             if (which is null) {
                 continue;
@@ -58,22 +65,29 @@ internal sealed class SpriteFonts
                 };
             }
 
+            // only honor global scale factor if this glyph is specifying a texture
+            int thisGlyphScale = 100;
             if (which.ScaleMetrics is not null) {
-                int scale = which?.ScaleMetrics ?? 100;
+                thisGlyphScale = (int)which.ScaleMetrics;
+            }
+            else if (which.Texture is not null && modData.Metrics.ScaleNewSources is not null) {
+                thisGlyphScale = (int)modData.Metrics.ScaleNewSources;
+            }
+
+            if (thisGlyphScale != 100) {
                 if (which.LeftSideBearing is not null) {
-                    which.LeftSideBearing = which.LeftSideBearing * scale / 100;
+                    which.LeftSideBearing = which.LeftSideBearing * thisGlyphScale / 100;
                 }
                 if (which.RightSideBearing is not null) {
-                    which.RightSideBearing = which.RightSideBearing * scale / 100;
+                    which.RightSideBearing = which.RightSideBearing * thisGlyphScale / 100;
                 }
                 if (which.AboveBaseline is not null) {
-                    which.AboveBaseline = which.AboveBaseline * scale / 100;
+                    which.AboveBaseline = which.AboveBaseline * thisGlyphScale / 100;
                 }
                 if (which.BelowBaseline is not null) {
-                    which.BelowBaseline = which.BelowBaseline * scale / 100;
+                    which.BelowBaseline = which.BelowBaseline * thisGlyphScale / 100;
                 }
-                which.SourceRect = which.SourceRect?.Scale(scale);
-                which.Padding = which.Padding?.Scale(scale);
+                which.Padding = which.Padding?.Scale(thisGlyphScale);
             }
 
             if (which.LeftSideBearing is not null) {
@@ -85,29 +99,36 @@ internal sealed class SpriteFonts
             // for new glyphs, this will always be defined (see above warning), but existing ones
             // might (should?) leave it alone
             if (which.SourceRect is not null) {
+                // bounds not scaled here because the scale is handled by box packer & renderer
                 glyph.BoundsInTexture = (Rectangle)which.SourceRect;
-                // this 16 is bad but it shouldn't be possible to fall back to it
-                glyph.Width = which.SourceRect?.Width ?? 16f;
+                glyph.Width = glyph.BoundsInTexture.Width * thisGlyphScale / 100;
             }
+            int thisGlyphHeight = glyph.BoundsInTexture.Height * thisGlyphScale / 100;
+
             SpritePadding padding = which.Padding ?? new();
             // honor padding.top if given, but otherwise default to on-baseline
             if (which.Padding?.Top is null) {
                 int dist = (which.AboveBaseline ?? (-1 * (which.BelowBaseline ?? 0)));
-                padding.Top = useBaseline - dist - glyph.BoundsInTexture.Height;
+                padding.Top = useBaseline - dist - thisGlyphHeight;
             }
-            int fullHeight = padding.Top ?? 0 + padding.Bottom ?? 0 + glyph.BoundsInTexture.Height;
+            int fullHeight = (padding.Top ?? 0) + (padding.Bottom ?? 0) + thisGlyphHeight;
+            // linespacing+1 is a dirty hack but so is everything else, really,
+            // so what's one more crime?
             glyph.Cropping = new Rectangle(padding.Left ?? 0, padding.Top ?? 0,
                     (padding.Left ?? 0) + (padding.Right ?? 0) + (int)glyph.Width,
-                    Math.Max(fullHeight, target.LineSpacing));
+                    Math.Max(fullHeight, lineSpacing+1));
             glyph.Width = glyph.Cropping.Width;
             glyph.WidthIncludingBearings = glyph.LeftSideBearing + glyph.Width +
                     glyph.RightSideBearing;
-            // texture check comes at the end since sourcerect may or may not be in our data
+
+            // only need to pack items that are coming from a different texture
+            // this has to come after SourceRect and scaling and so on
             if (which.Texture is not null) {
                 BoxesToPack.Add(new PackItem() {
                     Character = chKey,
                     Texture = which.Texture,
-                    Bounds = glyph.BoundsInTexture
+                    Bounds = glyph.BoundsInTexture,
+                    OutputScale = thisGlyphScale,
                 });
             }
 
@@ -131,20 +152,22 @@ internal sealed class SpriteFonts
             SpriteBatch sb = new(Game1.graphics.GraphicsDevice);
             Game1.graphics.GraphicsDevice.SetRenderTarget(render);
             Game1.graphics.GraphicsDevice.Clear(Color.Transparent);
-            sb.Begin();
+            sb.Begin(samplerState: SamplerState.PointClamp);
             sb.Draw(sourceTex,
                     position: new Vector2(0f, 0f),
                     color: Color.White);
 
             foreach (PackItem item in packed) {
                 item.Bounds.Y += sourceTex.Height;
+                //float scale = (float)item.OutputScale / 100f;
                 sb.Draw(Game1.content.Load<Texture2D>(item.Texture),
-                        position: new Vector2((float)item.Bounds.X, (float)item.Bounds.Y),
+                        destinationRectangle: item.Bounds,
+                        //position: new Vector2((float)item.Bounds.X, (float)item.Bounds.Y),
                         sourceRectangle: item.OriginalRect,
                         color: Color.White,
                         rotation: 0f,
                         origin: new Vector2(0f, 0f),
-                        scale: new Vector2(1f, 1f),
+                        //scale: new Vector2(scale, scale),
                         effects: SpriteEffects.None,
                         layerDepth: 1f);
                 // boo struct

@@ -25,7 +25,8 @@ internal sealed class BoxPacker
             List<PackItem> ret = new();
             List<Rectangle> freeSpaces = new() { new(0, 0, width, width*(i+1)) };
             foreach (PackItem item in input) {
-                Rectangle found = ClaimSpace(item.Bounds, ref freeSpaces);
+                Rectangle found = ClaimSpace(item.Bounds.Scale(item.OutputScale),
+                        ref freeSpaces);
                 if (found == Rectangle.Empty) {
                     // couldn't pack; try a bigger texture
                     bounds = Rectangle.Empty;
@@ -35,6 +36,7 @@ internal sealed class BoxPacker
                     Character = item.Character,
                     Texture = item.Texture,
                     Bounds = found,
+                    OutputScale = item.OutputScale,
                     OriginalRect = item.Bounds,
                 });
                 bounds.Width = Math.Max(bounds.Width, found.Right);
@@ -109,5 +111,6 @@ internal class PackItem
     public char Character;
     public string Texture;
     public Rectangle Bounds;
+    public int OutputScale;
     public Rectangle OriginalRect;
 }

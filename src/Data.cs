@@ -12,9 +12,9 @@ internal sealed class GlyphData
     internal static string TinyFontAsset = $"{Main.ModId}/TinyFont";
 
     private static Dictionary<string, BoldEntry> _BoldFontData = null;
-    private static Dictionary<string, SpriteEntry> _SpriteFont1Data = null;
-    private static Dictionary<string, SpriteEntry> _SmallFontData = null;
-    private static Dictionary<string, SpriteEntry> _TinyFontData = null;
+    private static SpriteFontPatchData _SpriteFont1Data = null;
+    private static SpriteFontPatchData _SmallFontData = null;
+    private static SpriteFontPatchData _TinyFontData = null;
 
     public static Dictionary<string, BoldEntry> BoldFont {
         get {
@@ -29,11 +29,10 @@ internal sealed class GlyphData
         }
     }
 
-    public static Dictionary<string, SpriteEntry> SpriteFont1 {
+    public static SpriteFontPatchData SpriteFont1 {
         get {
             if (_SpriteFont1Data is null) {
-                _SpriteFont1Data = Game1.content.Load
-                    <Dictionary<string, SpriteEntry>>(SpriteFont1Asset);
+                _SpriteFont1Data = Game1.content.Load<SpriteFontPatchData>(SpriteFont1Asset);
             }
             return _SpriteFont1Data;
         }
@@ -42,11 +41,10 @@ internal sealed class GlyphData
         }
     }
 
-    public static Dictionary<string, SpriteEntry> SmallFont {
+    public static SpriteFontPatchData SmallFont {
         get {
             if (_SmallFontData is null) {
-                _SmallFontData = Game1.content.Load
-                    <Dictionary<string, SpriteEntry>>(SmallFontAsset);
+                _SmallFontData = Game1.content.Load<SpriteFontPatchData>(SmallFontAsset);
             }
             return _SmallFontData;
         }
@@ -55,11 +53,10 @@ internal sealed class GlyphData
         }
     }
 
-    public static Dictionary<string, SpriteEntry> TinyFont {
+    public static SpriteFontPatchData TinyFont {
         get {
             if (_TinyFontData is null) {
-                _TinyFontData = Game1.content.Load
-                    <Dictionary<string, SpriteEntry>>(TinyFontAsset);
+                _TinyFontData = Game1.content.Load<SpriteFontPatchData>(TinyFontAsset);
             }
             return _TinyFontData;
         }
@@ -107,10 +104,23 @@ internal sealed class BoldGlyph
     public int? Baseline = null;
 }
 
+internal sealed class SpriteFontPatchData
+{
+    public SpriteFontMetrics Metrics = new();
+    public Dictionary<string, SpriteEntry> Glyphs = new();
+}
+
+internal sealed class SpriteFontMetrics
+{
+    public int? Baseline = null;
+    public int? LineSpacing = null;
+    public int? ScaleNewSources = null;
+}
+
 internal sealed class SpriteEntry
 {
     public string? Texture = null;
-    public int? ScaleMetrics = null; 
+    public int? ScaleMetrics = null;
     public Rectangle? SourceRect = null;
     public SpritePadding? Padding = null;
     public int? AboveBaseline = null;

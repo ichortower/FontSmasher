@@ -18,7 +18,7 @@ internal class Events
         }
         else if (SpriteFonts.GameFonts.Any(a => e.Name.IsEquivalentTo(a.DataAssetName))) {
             e.LoadFrom(() => {
-                return new Dictionary<string, SpriteEntry>();
+                return new SpriteFontPatchData();
             }, AssetLoadPriority.Exclusive);
         }
     }
