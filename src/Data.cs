@@ -11,16 +11,15 @@ internal sealed class GlyphData
     internal static string SmallFontAsset = $"{Main.ModId}/SmallFont";
     internal static string TinyFontAsset = $"{Main.ModId}/TinyFont";
 
-    private static Dictionary<string, BoldEntry> _BoldFontData = null;
+    private static BoldFontPatchData _BoldFontData = null;
     private static SpriteFontPatchData _SpriteFont1Data = null;
     private static SpriteFontPatchData _SmallFontData = null;
     private static SpriteFontPatchData _TinyFontData = null;
 
-    public static Dictionary<string, BoldEntry> BoldFont {
+    public static BoldFontPatchData BoldFont {
         get {
             if (_BoldFontData is null) {
-                _BoldFontData = Game1.content.Load
-                        <Dictionary<string, BoldEntry>>(BoldFontAsset);
+                _BoldFontData = Game1.content.Load<BoldFontPatchData>(BoldFontAsset);
             }
             return _BoldFontData;
         }
@@ -88,6 +87,11 @@ internal sealed class GlyphData
 
 
 #nullable enable
+
+internal sealed class BoldFontPatchData
+{
+    public Dictionary<string, BoldEntry> Glyphs = new();
+}
 
 internal sealed class BoldEntry
 {

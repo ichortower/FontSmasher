@@ -13,7 +13,7 @@ internal class Events
     {
         if (e.Name.IsEquivalentTo(GlyphData.BoldFontAsset)) {
             e.LoadFrom(() => {
-                return new Dictionary<string, BoldEntry>();
+                return new BoldFontPatchData();
             }, AssetLoadPriority.Exclusive);
         }
         else if (SpriteFonts.GameFonts.Any(a => e.Name.IsEquivalentTo(a.DataAssetName))) {

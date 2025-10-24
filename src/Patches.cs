@@ -69,7 +69,7 @@ internal class Patches
     internal static void SpriteText_getWidthOffsetForChar_Postfix(
             char c, ref int __result)
     {
-        if (GlyphData.BoldFont.TryGetValue(GlyphData.GetKey(c), out var val) &&
+        if (GlyphData.BoldFont.Glyphs.TryGetValue(GlyphData.GetKey(c), out var val) &&
                 (val?.LeftRightPadding ?? -1) >= 0) {
             __result = -1 * (int)val.LeftRightPadding;
         }
@@ -158,7 +158,7 @@ internal class Patches
             out Texture2D sourceTexture, out Rectangle sourceRect, out float baselineOffset)
     {
         BoldGlyph found = null;
-        if (GlyphData.BoldFont.TryGetValue(GlyphData.GetKey(c), out var entry)) {
+        if (GlyphData.BoldFont.Glyphs.TryGetValue(GlyphData.GetKey(c), out var entry)) {
             if (coloredText && entry?.Colored is not null) {
                 found = entry.Colored;
             }
