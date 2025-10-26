@@ -55,6 +55,19 @@ internal class Events
         }
     }
 
+    public static void OnLocaleChanged(object sender, LocaleChangedEventArgs e)
+    {
+        string[] checks = new string[] {
+            GlyphData.BoldFontAsset,
+            GlyphData.SpriteFont1Asset,
+            GlyphData.SmallFontAsset,
+            GlyphData.TinyFontAsset,
+        };
+        Main.instance.Helper.GameContent.InvalidateCache((asset) => {
+            return checks.Any(c => asset.Name.IsEquivalentTo(c));
+        });
+    }
+
     public static void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
     {
     }
