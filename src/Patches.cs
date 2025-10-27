@@ -21,6 +21,10 @@ internal class Patches
                 nameof(StardewValley.BellsAndWhistles.SpriteText.getWidthOffsetForChar),
                 null,
                 nameof(Patches.SpriteText_getWidthOffsetForChar_Postfix));
+        PatchMethod(harmony, typeof(SpriteText),
+                nameof(SpriteText.positionOfNextSpace),
+                null,
+                nameof(Patches.SpriteText_positionOfNextSpace_Transpiler));
         PatchMethod(harmony, typeof(StardewValley.BellsAndWhistles.SpriteText),
                 "drawString",
                 null,
@@ -89,6 +93,26 @@ internal class Patches
         }
     }
 
+    internal static IEnumerable<CodeInstruction> SpriteText_positionOfNextSpace_Transpiler(
+            IEnumerable<CodeInstruction> instructions,
+            ILGenerator generator,
+            MethodBase original)
+    {
+        CodeMatcher cm = new(instructions);
+
+        // instead of checking previous? character's offset, account for both sides of this one
+        // TODO this can't just be a dup once we support asymmetrical bearings
+        cm.MatchStartForward(
+            new (OpCodes.Ldarg_0),
+            new (OpCodes.Ldc_I4_0),
+            new (OpCodes.Ldloc_S),
+            new (OpCodes.Ldc_I4_1))
+        .RemoveInstructions(8)
+        .InsertAndAdvance(
+            new CodeInstruction(OpCodes.Dup));
+        return cm.InstructionEnumeration();
+    }
+
     internal static IEnumerable<CodeInstruction> SpriteText_drawString_Transpiler(
             IEnumerable<CodeInstruction> instructions,
             ILGenerator generator,
@@ -97,7 +121,13 @@ internal class Patches
         LocalBuilder sourceTexture = generator.DeclareLocal(typeof(Texture2D));
         MethodInfo GetSourceForChar = typeof(Patches).GetMethod(nameof(Patches.GetSourceForChar),
                 BindingFlags.NonPublic | BindingFlags.Static);
+        MethodInfo ShiftDrawStart = typeof(Patches).GetMethod(nameof(Patches.ShiftDrawStart),
+                BindingFlags.NonPublic | BindingFlags.Static);
+        MethodInfo ShiftDrawEnd = typeof(Patches).GetMethod(nameof(Patches.ShiftDrawEnd),
+                BindingFlags.NonPublic | BindingFlags.Static);
         LocalBuilder yOffset = generator.DeclareLocal(typeof(float));
+        FieldInfo Vector2XField = typeof(Vector2).GetField(nameof(Vector2.X),
+                BindingFlags.Public | BindingFlags.Instance);
         FieldInfo Vector2YField = typeof(Vector2).GetField(nameof(Vector2.Y),
                 BindingFlags.Public | BindingFlags.Instance);
 
@@ -121,7 +151,7 @@ internal class Patches
             new (OpCodes.Ldarg_2))
 
         // replace the call to SpriteText.getSourceRectForChar with a call to our GetSourceForChar.
-        // ours returns more values (via out parameters), so get those sorted out afterward as well
+        // ours returns values via out parameters, so the original stloc is removed
         .MatchStartForward(
             new (OpCodes.Ldarg_1),
             new (OpCodes.Ldloc_S),
@@ -138,6 +168,13 @@ internal class Patches
             new (OpCodes.Ldloca_S, 16),
             new (OpCodes.Ldloca_S, yOffset),
             new (OpCodes.Call, GetSourceForChar))
+        // adjust draw position for the current character (minus left-side offset)
+        .InsertAndAdvance(
+            new (OpCodes.Ldloca_S, 2),
+            new (OpCodes.Ldflda, Vector2XField),
+            new (OpCodes.Ldarg_1),
+            new (OpCodes.Ldloc_S, 12),
+            new (OpCodes.Call, ShiftDrawStart))
         // preserve ldarg.0 for the eventual draw call
         .Advance(1)
         // remove texture selection and use our baseline offset and texture instead
@@ -146,7 +183,21 @@ internal class Patches
             new (OpCodes.Ldloca_S, 15),
             new (OpCodes.Ldloc_S, yOffset),
             new (OpCodes.Stfld, Vector2YField),
-            new (OpCodes.Ldloc_S, sourceTexture));
+            new (OpCodes.Ldloc_S, sourceTexture))
+        // replace default width-adjust calculation (weird, bad) with ours (differently bad)
+        .MatchStartForward(
+            new (OpCodes.Callvirt),
+            new (OpCodes.Ldloc_S))
+        .Advance(1)
+        .RemoveUntilForward(
+            new (OpCodes.Ldloc_S),
+            new (OpCodes.Stsfld))
+        .InsertAndAdvance(
+            new (OpCodes.Ldloca_S, 2),
+            new (OpCodes.Ldflda, Vector2XField),
+            new (OpCodes.Ldarg_1),
+            new (OpCodes.Ldloc_S, 12),
+            new (OpCodes.Call, ShiftDrawEnd));
 
         return cm.InstructionEnumeration();
     }
@@ -211,6 +262,20 @@ internal class Patches
         }
         return char.IsUpper(c) ? 0 : 3;
     }
+
+    /*
+     * this and the next one are just to make the transpiler easier to write lol
+     */
+    internal static void ShiftDrawStart(ref float x, string s, int i)
+    {
+        x -= (SpriteText.FontPixelZoom * -1 * SpriteText.getWidthOffsetForChar(s[i]));
+    }
+
+    internal static void ShiftDrawEnd(ref float x, string s, int i)
+    {
+        x += (SpriteText.FontPixelZoom * (8f + SpriteText.getWidthOffsetForChar(s[i])));
+    }
+
 
     internal static void PatchMethod(Harmony harmony, Type t, string name,
             Type[] argTypes, string patch)
