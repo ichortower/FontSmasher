@@ -71,18 +71,5 @@ internal class Events
     public static void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
     {
     }
-
-    public static void OnGameLaunched(object sender, GameLaunchedEventArgs e)
-    {
-        // register GMCM entries here
-    }
-
-    public static void OnDayStarted(object sender, DayStartedEventArgs e)
-    {
-    }
-
-    public static void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
-    {
-    }
 }
 
