@@ -1,3 +1,4 @@
+using ContentPatcher;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -68,8 +69,29 @@ internal class Events
         });
     }
 
+    private static IContentPatcherAPI _cpapi = null;
+    internal static IContentPatcherAPI CPAPI {
+        get {
+            if (_cpapi is null) {
+                _cpapi = Main.instance.Helper.ModRegistry.GetApi
+                        <IContentPatcherAPI>("Pathoschild.ContentPatcher");
+            }
+            return _cpapi;
+        }
+    }
+
     public static void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
     {
+        if (!CPAPI.IsConditionsApiReady) {
+            return;
+        }
+
+        _ = GlyphData.BoldFont;
+        _ = GlyphData.SpriteFont1;
+        _ = GlyphData.SmallFont;
+        _ = GlyphData.TinyFont;
+
+        Main.instance.Helper.Events.GameLoop.UpdateTicked -= Events.OnUpdateTicked;
     }
 }
 

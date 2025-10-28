@@ -18,7 +18,7 @@ internal sealed class Main : Mod
         helper.Events.Content.AssetReady += Events.OnAssetReady;
         helper.Events.Content.AssetsInvalidated += Events.OnAssetsInvalidated;
         helper.Events.Content.LocaleChanged += Events.OnLocaleChanged;
-        //helper.Events.GameLoop.UpdateTicked += Events.OnUpdateTicked;
+        helper.Events.GameLoop.UpdateTicked += Events.OnUpdateTicked;
 
         Patches.Apply();
     }
