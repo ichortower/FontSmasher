@@ -53,6 +53,7 @@ internal sealed class SpriteFonts
                 continue;
             }
             char chKey = GlyphData.GetReverseKey(kvp.Key);
+            bool newGlyph = false;
             if (!fontGlyphs.TryGetValue(chKey, out SpriteFont.Glyph glyph)) {
                 if (which.SourceRect is null) {
                     Log.Warn($"For glyph '{kvp.Key}' ({fr.DataFieldName}): this glyph " +
@@ -60,6 +61,7 @@ internal sealed class SpriteFonts
                             "'SourceRect' was not specified. Skipping this glyph.");
                     continue;
                 }
+                newGlyph = true;
                 glyph = new SpriteFont.Glyph() {
                     Character = chKey,
                 };
@@ -72,6 +74,11 @@ internal sealed class SpriteFonts
             }
             else if (which.Texture is not null && modData.Metrics.ScaleNewSources is not null) {
                 thisGlyphScale = (int)modData.Metrics.ScaleNewSources;
+            }
+
+            if (newGlyph) {
+                which.LeftSideBearing ??= 1f;
+                which.RightSideBearing ??= 1f;
             }
 
             if (thisGlyphScale != 100) {
