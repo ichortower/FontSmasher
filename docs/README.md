@@ -8,8 +8,23 @@ and supported.
 
 ## Goal (or: Why?)
 
-[Font Settings](https://www.nexusmods.com/stardewvalley/mods/12467) is a
-perfectly cromulent mod that solves the same problems as Font Smasher, but in a
+First of all, the vanilla fonts aren't amenable to extension. Consider the bold
+(dialogue) font:
+
+- Relies on integer sprite indexes on a single shared texture, so is prone to
+  collisions
+- Uses a character's Unicode code point as an index, except when it has
+  hardcoded exceptions, so some collisions are already baked in
+
+And consider the sprite (interface) fonts:
+
+- No ability to edit or extend, only to replace wholesale using an XNB
+- Typically loaded before Content Patcher comes online and kept in cache for
+  the whole session, so difficult to edit
+
+Second, [Font Settings](https://www.nexusmods.com/stardewvalley/mods/12467) is
+a perfectly cromulent mod that solves the same problems as Font Smasher (lack
+of specific glyphs and/or desire to use different letterforms), but in a
 user-facing way: it is fully controlled by the user and is opaque to mod
 authors, so if a content modder wants to use extra diacritics or other special
 characters not supported by the base game, the only recourse available is to
@@ -17,12 +32,21 @@ ask users to configure a font that includes the desired glyphs. Not only is
 this prone to error, it leaves the user and the modder unable to use the
 default fonts, if they happen to like them.
 
-Font Smasher's purpose is to allow modders to add the glyphs they need and/or
-edit ones in the base fonts (or [replace them
-entirely](https://github.com/ichortower/MerchantSans)), so the author can set a
-dependency on a particular font mod that provides the glyphs, or even include
-the Font Smasher data directly in their own mod and eliminate the difficulty
-altogether.
+Font Smasher's purpose is to address both of these issues. It allows modders to
+add glyphs to and/or edit glyphs in the base fonts (or [go ham and replace them
+all](https://github.com/ichortower/MerchantSans)), so they can set a dependency
+on a particular font mod that provides the glyphs, or even include the Font
+Smasher data directly in their own mod and eliminate the difficulty altogether.
+
+Speaking of Font Settings...
+
+
+## Compatibility
+
+This mod almost certainly isn't compatible with Font Settings, since (I
+presume) that mod reimplements font rendering in most/all situations and
+probably negates or interferes with the changes I had to make to font
+rendering.
 
 
 ## How to Use
@@ -38,8 +62,8 @@ which is intended for mod authors. If you don't need it, it is safe to delete.
 As a mod author, this framework provides data assets which your mod should edit
 in order to give it information about the glyphs you want to add or change. At
 this time, you are expected to use Content Patcher for this. I may add a C# API
-or better support for SMAPI's content API in the future, but I suspect using
-Content Patcher will suffice for almost everyone.
+and/or better support for SMAPI's content API in the future, but I suspect
+using Content Patcher will suffice for almost everyone.
 
 For details about the data assets and how to use them, see the [author
 guide](author-guide.md).
@@ -47,4 +71,5 @@ guide](author-guide.md).
 
 ## Special Thanks
 
-Abagaianye, for the snipe.
+- Abagaianye, for the snipe in particular.
+- Everyone on the Stardew Valley and Stardew Modmakers' discords, in general.
