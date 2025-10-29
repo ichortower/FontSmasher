@@ -1,0 +1,16 @@
+{
+  "Name": "Font Smasher Sample Content Pack",
+  "Author": "ichortower",
+  "Description": "Adds support for some extra diacritics (a-, e-, i-, o-, and u-with-macron, and y-with-circumflex), as an example of how to make a font mod using Font Smasher.",
+  "Version": "1.0.0",
+  "UniqueID": "ichortower.FontSmasherSamplePack",
+  "ContentPackFor": {
+    "UniqueID": "Pathoschild.ContentPatcher"
+  },
+  "UpdateKeys": ["Nexus:38900", "GitHub:ichortower/FontSmasher"],
+  "Dependencies": [
+    {
+      "UniqueId": "ichortower.FontSmasher"
+    }
+  ]
+}

@@ -1,0 +1,308 @@
+{
+  "Format": "2.8.0",
+  "Changes": [
+    {
+      "Target": "{{ModId}}/texture",
+      "Action": "Load",
+      "FromFile": "assets/texture.png"
+    },
+    // NB. it is a limitation of Content Patcher/Newtonsoft JSON that keys are treated as
+    // case-insensitive, so using the upper- and lowercase versions of a given letter as keys
+    // in the same patch will cause them to collapse into one entry. To avoid this, you must
+    // either split the upper and lowercase letters into separate patches (see these BoldFont
+    // patches for that), or artificially lengthen one of the keys (see the SpriteFont1
+    // patches for that). Font Smasher will consider only the first character of the key when
+    // mapping data to a glyph, so it is safe to make the key longer in order to avoid collisions.
+    // However, note that this may get strange if multiple mods edit the same glyph and choose
+    // different suffixes to lengthen, since the resulting glyph data will depend on the
+    // dictionary sort order (when iterating) and not necessarily on patch priority.
+    {
+      "Target": "ichortower.FontSmasher/BoldFont",
+      "Action": "EditData",
+      "TargetField": ["Glyphs"],
+      "Entries": {
+        // In these samples, for the junimo text version of each letter I am assigning it the
+        // vanilla index of the same letter without any diacritics, which is equivalent to how
+        // the base game diacritics are handled (they are identical to the plain letter).
+        "Ā": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 0 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 16 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 257 }
+        },
+        "Ē": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 2 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 18 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 261 }
+        },
+        "Ī": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 4 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 20 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 265 }
+        },
+        "Ō": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 6 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 22 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 271 }
+        },
+        "Ū": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 8 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 24 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 277 }
+        },
+        "Ŷ": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 10 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 26 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 281 }
+        }
+      }
+    },
+    {
+      "Target": "ichortower.FontSmasher/BoldFont",
+      "Action": "EditData",
+      "TargetField": ["Glyphs"],
+      "Entries": {
+        "ā": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 1 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 17 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 289 }
+        },
+        "ē": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 3 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 19 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 293 }
+        },
+        // LeftRightPadding is unique to BoldFont and applies to all three forms (Dialogue,
+        // Colored, and Junimo). It is trimmed from both sides of the 8x16 bounding box, so the
+        // only attainable glyph widths are 8 (padding 0, the default), 6 (padding 1), 4
+        // (padding 2), and 2 (padding 3).
+        // In the vanilla bold font, most characters have no padding and are the full 8 px wide.
+        "ī": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 5 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 21 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 297 },
+          "LeftRightPadding": 1
+        },
+        "ō": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 7 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 23 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 303 }
+        },
+        "ū": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 9 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 25 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 309 }
+        },
+        "ŷ": {
+          "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 11 },
+          "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 27 },
+          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 313 }
+        }
+      }
+    },
+
+    {
+      "Target": "ichortower.FontSmasher/SpriteFont1",
+      "Action": "EditData",
+      "TargetField": ["Glyphs"],
+      "Entries": {
+        "Ā": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 0, "Y": 34, "Width": 5, "Height": 11
+          }
+        },
+        "Ē": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 16, "Y": 35, "Width": 6, "Height": 10
+          }
+        },
+        // LeftSideBearing and RightSideBearing are for SpriteFonts and are the amount of
+        // space (measured in pixels) to leave on the respective sides when drawing the glyph.
+        // If not specified, the default is 1.0 (scaled by ScaleMetrics, if applicable).
+        // The bearings can be negative (here the macron overhangs quite a bit).
+        "Ī": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 32, "Y": 35, "Width": 5, "Height": 10
+          },
+          "LeftSideBearing": 0.0,
+          "RightSideBearing": 0.0
+        },
+        "Ō": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 48, "Y": 34, "Width": 8, "Height": 11
+          }
+        },
+        "Ū": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 64, "Y": 34, "Width": 7, "Height": 11
+          }
+        },
+        "Ŷ": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 80, "Y": 32, "Width": 7, "Height": 13
+          }
+        },
+        // see top for explanation of artificially-lengthened keys
+        "ā lower": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 8, "Y": 37, "Width": 6, "Height": 8
+          }
+        },
+        "ē lower": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 24, "Y": 37, "Width": 5, "Height": 8
+          }
+        },
+        "ī lower": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 40, "Y": 37, "Width": 3, "Height": 8
+          }
+        },
+        "ō lower": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 56, "Y": 37, "Width": 5, "Height": 8
+          }
+        },
+        "ū lower": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 72, "Y": 37, "Width": 6, "Height": 8
+          }
+        },
+        "ŷ lower": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 300,
+          "SourceRect": {
+            "X": 88, "Y": 36, "Width": 5, "Height": 12
+          },
+          "BelowBaseline": 3
+        }
+      }
+    },
+
+    // for SmallFont, aside from using the split patch method, this is all the same as SpriteFont1
+    // except scaled by 200 instead of 300 (so we get the same font, but at 2x instead of 3x,
+    // which is how vanilla is set up).
+    {
+      "Target": "ichortower.FontSmasher/SmallFont",
+      "Action": "EditData",
+      "TargetField": ["Glyphs"],
+      "Entries": {
+        "Ā": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 0, "Y": 34, "Width": 5, "Height": 11
+          }
+        },
+        "Ē": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 16, "Y": 35, "Width": 6, "Height": 10
+          }
+        },
+        "Ī": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 32, "Y": 35, "Width": 5, "Height": 10
+          },
+          "LeftSideBearing": 0.0,
+          "RightSideBearing": 0.0
+        },
+        "Ō": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 48, "Y": 34, "Width": 8, "Height": 11
+          }
+        },
+        "Ū": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 64, "Y": 34, "Width": 7, "Height": 11
+          }
+        },
+        "Ŷ": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 80, "Y": 32, "Width": 7, "Height": 13
+          }
+        }
+      }
+    },
+    {
+      "Target": "ichortower.FontSmasher/SmallFont",
+      "Action": "EditData",
+      "TargetField": ["Glyphs"],
+      "Entries": {
+        "ā": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 8, "Y": 37, "Width": 6, "Height": 8
+          }
+        },
+        "ē": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 24, "Y": 37, "Width": 5, "Height": 8
+          }
+        },
+        "ī": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 40, "Y": 37, "Width": 3, "Height": 8
+          }
+        },
+        "ō": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 56, "Y": 37, "Width": 5, "Height": 8
+          }
+        },
+        "ū": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 72, "Y": 37, "Width": 6, "Height": 8
+          }
+        },
+        "ŷ": {
+          "Texture": "{{ModId}}/texture",
+          "ScaleMetrics": 200,
+          "SourceRect": {
+            "X": 88, "Y": 36, "Width": 5, "Height": 12
+          },
+          "BelowBaseline": 3
+        }
+      }
+    }
+  ] // Changes
+}
