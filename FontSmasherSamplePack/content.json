@@ -189,6 +189,10 @@
             "X": 72, "Y": 37, "Width": 6, "Height": 8
           }
         },
+        // BelowBaseline (and counterpart AboveBaseline) are shortcuts to position a glyph
+        // vertically without doing extra math to calculate its Padding box. Omit if the glyph
+        // sits right on the baseline (e.g. 'A'), or specify just one as needed: here 'ŷ' is a
+        // descender and extends three pixels below.
         "ŷ lower": {
           "Texture": "{{ModId}}/texture",
           "ScaleMetrics": 300,
