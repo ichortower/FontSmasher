@@ -2,11 +2,11 @@
   "Name": "Font Smasher",
   "Author": "ichortower",
   "Description": "A framework for adding and editing glyphs in the latin-alphabet game fonts.",
-  "Version": "0.8.0-alpha",
+  "Version": "0.9.0-alpha",
   "UniqueID": "ichortower.FontSmasher",
   "EntryDll": "FontSmasher.dll",
-  "MinimumApiVersion": "4.1.0",
-  "UpdateKeys": ["Nexus:-1", "GitHub:ichortower/FontSmasher"],
+  "MinimumApiVersion": "4.1.10",
+  "UpdateKeys": ["Nexus:38900", "GitHub:ichortower/FontSmasher"],
   "Dependencies": [
     {
       "UniqueID": "Pathoschild.ContentPatcher"
