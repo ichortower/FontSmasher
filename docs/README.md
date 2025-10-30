@@ -48,6 +48,12 @@ presume) that mod reimplements font rendering in most/all situations and
 probably negates or interferes with the changes I had to make to font
 rendering.
 
+In addition, right now this mod only partially supports Chinese, Japanese, and
+Korean: the BmFont type used for those languages' dialogue fonts is not
+supported, but they also use SpriteFonts for SpriteFont1 and SmallFont, and
+those do work. However, their default sprite fonts are very different from the
+latin ones, so it's probably better to treat them separately.
+
 
 ## How to Use
 

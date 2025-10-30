@@ -153,8 +153,9 @@ offsets to make font_bold line up), which is probably not what you want.
 <td>int</td>
 <td>
 
-How high off the bottom of the 8x16 glyph sprite the font's baseline is. If
-omitted, this is `0` for uppercase letters and `3` for lowercase ones.
+How high off the bottom of the 8x16 glyph sprite the font's baseline is, in
+pixels. If omitted, this is `0` for uppercase letters and `3` for lowercase
+ones.
 
 The vanilla glyphs put the bottom row of shadow on the baseline, and the actual
 glyph is one pixel above it.
