@@ -221,14 +221,19 @@ internal class Patches
             }
         }
 
-        if (found?.Texture is not null && (found?.SpriteIndex ?? -1) >= 0) {
+        if (found?.Texture is not null) {
             sourceTexture = Game1.content.Load<Texture2D>(found.Texture);
+        }
+        else {
+            sourceTexture = (coloredText ? SpriteText.coloredTexture : SpriteText.spriteTexture);
+        }
+
+        if ((found?.SpriteIndex ?? -1) >= 0) {
             sourceRect = new(((int)found.SpriteIndex * 8) % sourceTexture.Width,
                     (((int)found.SpriteIndex * 8) / sourceTexture.Width) * 16,
                     8, 16);
         }
         else {
-            sourceTexture = (coloredText ? SpriteText.coloredTexture : SpriteText.spriteTexture);
             sourceRect = (Rectangle)Method_getSourceRectForChar.Invoke(null, new object[] {c, junimoText});
         }
 
