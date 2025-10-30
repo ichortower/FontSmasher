@@ -27,32 +27,32 @@
         "Ā": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 0 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 16 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 257 }
+          "Junimo": { "SpriteIndex": 257 }
         },
         "Ē": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 2 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 18 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 261 }
+          "Junimo": { "SpriteIndex": 261 }
         },
         "Ī": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 4 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 20 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 265 }
+          "Junimo": { "SpriteIndex": 265 }
         },
         "Ō": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 6 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 22 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 271 }
+          "Junimo": { "SpriteIndex": 271 }
         },
         "Ū": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 8 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 24 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 277 }
+          "Junimo": { "SpriteIndex": 277 }
         },
         "Ŷ": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 10 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 26 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 281 }
+          "Junimo": { "SpriteIndex": 281 }
         }
       }
     },
@@ -64,12 +64,12 @@
         "ā": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 1 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 17 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 289 }
+          "Junimo": { "SpriteIndex": 289 }
         },
         "ē": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 3 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 19 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 293 }
+          "Junimo": { "SpriteIndex": 293 }
         },
         // LeftRightPadding is unique to BoldFont and applies to all three forms (Dialogue,
         // Colored, and Junimo). It is trimmed from both sides of the 8x16 bounding box, so the
@@ -79,23 +79,23 @@
         "ī": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 5 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 21 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 297 },
+          "Junimo": { "SpriteIndex": 297 },
           "LeftRightPadding": 1
         },
         "ō": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 7 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 23 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 303 }
+          "Junimo": { "SpriteIndex": 303 }
         },
         "ū": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 9 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 25 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 309 }
+          "Junimo": { "SpriteIndex": 309 }
         },
         "ŷ": {
           "Dialogue": { "Texture": "{{ModId}}/texture", "SpriteIndex": 11 },
           "Colored": { "Texture": "{{ModId}}/texture", "SpriteIndex": 27 },
-          "Junimo": { "Texture": "LooseSprites/font_bold", "SpriteIndex": 313 }
+          "Junimo": { "SpriteIndex": 313 }
         }
       }
     },
