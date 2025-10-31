@@ -34,7 +34,7 @@ default fonts, if they happen to like them.
 
 Font Smasher's purpose is to address both of these issues. It allows modders to
 add glyphs to and/or edit glyphs in the base fonts (or [go ham and replace them
-all](https://github.com/ichortower/MerchantSans)), so they can set a dependency
+all](https://github.com/ichortower/CobaltSans)), so they can set a dependency
 on a particular font mod that provides the glyphs, or even include the Font
 Smasher data directly in their own mod and eliminate the difficulty altogether.
 
