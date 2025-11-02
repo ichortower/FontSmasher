@@ -13,7 +13,7 @@ bleh
 ## Introduction
 
 Font Smasher works by providing data assets for other mods to edit. At this
-time, clients are expected to be Content Patcher content packs; a C#/SMAPI
+time, clients are expected to be Content Patcher content packs; a C# / SMAPI
 interface may follow later.
 
 Generally, the way to add or edit glyphs is to target the assets for the fonts
@@ -43,7 +43,7 @@ because they are more restrictive. To edit them, target this asset:
 
 <tr>
 <td><code>Glyphs</code></td>
-<td>string-&gt;model dictionary</td>
+<td>string&rarr;model dictionary</td>
 <td>
 
 The only field present in this font (this is for two reasons: one, to harmonize
@@ -113,8 +113,8 @@ for regular dialogue when `junimoText` is active.
 How many pixels on both sides of the glyph's 8x16 texture are unused, and
 should therefore be trimmed when rendering (default `0`). Due to limitations at
 this time, the padding must apply to both sides, so the only valid character
-widths are 8 (0), 6 (1), 4 (2), and 2 (3). In vanilla, most glyphs have 0
-padding.
+widths are 8 (0), 6 (1), 4 (2), and 2 (3), and glyphs must be drawn centered in
+their bounding boxes. In vanilla, most glyphs have 0 padding.
 
 </td>
 </tr>
@@ -299,7 +299,7 @@ patch the entirety of SmallFont at 2x.
 
 <tr>
 <td><code>Glyphs</code></td>
-<td>string-&gt;model dictionary</td>
+<td>string&rarr;model dictionary</td>
 <td>
 
 Just like the Glyphs field used in the Bold fonts, above, keys should typically
@@ -396,14 +396,14 @@ area (the SourceRect), in order to position it correctly in the line of text.
 
 This field is optional, and in most cases it is not recommended to specify it
 at all, since AboveBaseline and BelowBaseline handle vertical positioning, and
-LeftSideBearing and RightSideBearing are indistinguishable in practice from
-Left and Right padding. But if you wish to specify any part of it, you can just
-list the parts you want and omit the others.
+LeftSideBearing and RightSideBearing are mostly indistinguishable from Left and
+Right padding. But if you wish to specify any part of it, you can just list the
+parts you want and omit the others.
 
-(the Left and Right padding values are considered part of the glyph, even
-though they are whitespace, while the Bearing values are not part of the glyph;
-but they accomplish the same goal of putting more space around the glyph's
-visible form)
+(the Left and Right padding values are considered part of the glyph, and so are
+always rendered, while the LeftSideBearing is omitted if this glyph is the first
+on its line of text. The difference is nearly imperceptible, and generally the
+bearing behavior is the more desirable)
 
 </td>
 </tr>
@@ -468,6 +468,68 @@ Will default to `1.0` if unspecified for a new glyph.
 
 </table>
 
+
+### Example
+
+For example, let's add the same glyphs from the earlier bold examples (`Ȁ` and
+`ğ`) to the sprite fonts. Here's an example texture: ![A minimal example
+texture containing only the glyphs Ȁ and ğ, included for demonstration
+purposes](sample-sprite-texture.png)
+
+```json
+{
+  "Target": "{{ModId}}/Example",
+  "Action": "Load",
+  "FromFile": "assets/{{TargetWithoutPath}}.png"
+},
+{
+  "Target": "ichortower.FontSmasher/SpriteFont1",
+  "Action": "EditData",
+  "TargetField": ["Glyphs"],
+  "Entries": {
+    "Ȁ": {
+      "Texture": "{{ModId}}/Example",
+      "ScaleMetrics": 300,
+      "SourceRect": {
+        "X": 0, "Y": 0, "Width": 6, "Height": 13
+      }
+    },
+    "ğ": {
+      "Texture": "{{ModId}}/Example",
+      "ScaleMetrics": 300,
+      "SourceRect": {
+        "X": 8, "Y": 4, "Width": 6, "Height": 12
+      },
+      "BelowBaseline": 3,
+      "RightSideBearing": 0.0
+    }
+  }
+},
+{
+  "Target": "ichortower.FontSmasher/SmallFont",
+  "Action": "EditData",
+  "TargetField": ["Glyphs"],
+  "Entries": {
+    "Ȁ": {
+      "Texture": "{{ModId}}/Example",
+      "ScaleMetrics": 200,
+      "SourceRect": {
+        "X": 0, "Y": 0, "Width": 6, "Height": 13
+      }
+    },
+    "ğ": {
+      "Texture": "{{ModId}}/Example",
+      "ScaleMetrics": 200,
+      "SourceRect": {
+        "X": 8, "Y": 4, "Width": 6, "Height": 12
+      },
+      "BelowBaseline": 3,
+      "RightSideBearing": 0.0
+    }
+  }
+}
+```
+
 ## Caveats
 
 ### Upper- and Lowercase Glyphs
@@ -494,10 +556,10 @@ lowercase f without colliding. This works because Font Smasher deliberately
 discards everything after the first character in the key when deciding which
 glyph to target, but providing the extra (discarded) information makes the key
 unique and prevents Newtonsoft from collapsing them. This has the advantage of
-letting you put all your glyphs in the same patch, but it might cause strange
-behavior if multiple mods edit the same glyph with different suffixes: the
-edits will end up applying in dictionary sort order instead of patch
-priority/load order.
+letting you put all your glyphs in the same patch, but it might cause
+unexpected behavior if multiple mods edit the same glyph with different
+suffixes: the edits will end up applying in dictionary sort order instead of
+patch priority/load order.
 
 There are examples of both approaches in the sample content pack.
 
@@ -509,10 +571,10 @@ which makes using any whitespace glyph an issue: either it will be deleted
 entirely, or (if given a suffix) the suffix will end up becoming the key after
 the whitespace is "helpfully" trimmed.
 
-To circumvent this, the space character (`0x20`, ' ') is targeted by using the
-special key `"<Space>"`. Likewise, the non-breaking space (`0xa0`, ' ') is
+To circumvent this, the space character (U+0020, ' ') is targeted by using the
+special key `"<Space>"`. Likewise, the non-breaking space (U+00a0, ' ') is
 targeted with the key `"<Nbsp>"`. No other whitespace characters are currently
-supported, but as far as I know only the regular space is ever used or even
+supported, but as far as I know, only the regular space is ever used or even
 functional in the game.
 
 
@@ -534,3 +596,13 @@ languages, or when a configurable font pack changes some of its patch
 instructions), the cost will need to be paid again, but I expect that in
 standard use, a given user will set up their configs and then not fiddle much
 with them, so it shouldn't be a big deal.
+
+
+## Potential Future Features
+
+No promises. This is a wishlist.
+
+- Ligatures
+- Kerning
+- Asymmetric trimming in bold font
+- Performance improvements
