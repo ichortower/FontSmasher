@@ -7,7 +7,21 @@ that came bundled with this mod.
 
 ## Contents
 
-bleh
+- [Introduction](#introduction)
+- [Bold Fonts](#bold-fonts)
+  - [Format](#format)
+  - [Glyph Model Format](#glyph-model-format)
+  - [Glyph Sub-Object Format](#glyph-sub-object-format)
+  - [Example](#example)
+- [Sprite Fonts](#sprite-fonts)
+  - [Format](#format-1)
+  - [Glyph Model Format](#glyph-model-format-1)
+  - [Example](#example-1)
+- [Caveats](#caveats)
+  - [Upper and Lowercase Glyphs](#upper-and-lowercase-glyphs)
+  - [Targeting Whitespace Glyphs](#targeting-whitespace-glyphs)
+  - [Performance Notes](#performance-notes)
+- [Potential Future Features](#potential-future-features)
 
 
 ## Introduction
@@ -548,6 +562,11 @@ ScaleMetrics: it sits on the baseline, and the default bearings are fine. For
 to the right, it will generally look nicer with less space on that side, so we
 set the RightSideBearing to zero.
 
+Note that you are under no obligation to arrange your glyphs in a particular
+way when providing a texture for patches to the sprite fonts. Any arrangement
+is valid as long as your SourceRects are correct, although I find it helpful to
+order them and line them up with each other.
+
 Unfortunately, patching both fonts separately means we have to copy-paste the
 patch and change the scaling number. However, Content Patcher has a great
 solution for this problem in [Local
@@ -555,9 +574,10 @@ Tokens](https://github.com/Pathoschild/StardewMods/blob/develop/ContentPatcher/d
 or if you wish to use different data and thus have two different fonts for
 SpriteFont1 and SmallFont, that option is available to you.
 
+
 ## Caveats
 
-### Upper- and Lowercase Glyphs
+### Upper and Lowercase Glyphs
 
 When patching the font types, the keys for your Entries or Fields patches are
 generally expected to be single characters. Unfortunately, it is a shortcoming
