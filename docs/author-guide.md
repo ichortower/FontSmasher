@@ -472,9 +472,11 @@ Will default to `1.0` if unspecified for a new glyph.
 ### Example
 
 For example, let's add the same glyphs from the earlier bold examples (`Ȁ` and
-`ğ`) to the sprite fonts. Here's an example texture: ![A minimal example
-texture containing only the glyphs Ȁ and ğ, included for demonstration
-purposes](sample-sprite-texture.png)
+`ğ`) to the sprite fonts. Here's an example texture (rendered here at 4x), with the SourceRects drawn in and labeled:
+
+![An example font texture showing the glyphs Ȁ and ğ, with bounding boxes drawn
+and labeled to illustrate how they should be set up by
+users](sample-sprite-texture.png)
 
 ```json
 {
