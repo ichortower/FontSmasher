@@ -198,9 +198,14 @@ For example, let's add a glyph to the bold fonts: `Ȁ`.
 ```
 
 Here, we've used two new textures, each with Ȁ at the top-left, for the
-Dialogue and Colored glyphs, and for junimo text we've given the index of the
-junimo A in the `font_bold` sheet, since in vanilla all diacritic-marked junimo
-letters are identical.
+Dialogue and Colored glyphs. Perhaps they look like this:
+
+![An example texture, rendered at 4x scale, showing one glyph: Ȁ](sample-bold-texture-1.png)
+![An example texture, rendered at 4x scale, showing one glyph: Ȁ](sample-bold-texture-2.png)
+
+For junimo text we've given the index of the junimo A in the `font_bold` sheet,
+since in vanilla all diacritic-marked junimo letters are identical to the
+unmarked ones.
 
 Alternately, let's edit the glyph `ğ`. As it is already present in `font_bold`,
 we can edit the image assets and just give the data we need:
@@ -237,9 +242,13 @@ we can edit the image assets and just give the data we need:
 }
 ```
 
-In this example, we've used a ğ glyph that is only 6 pixels wide, so we tell
-Font Smasher to trim the whitespace when rendering. We also use the index for
-`g`'s junimo glyph, so ğ will be visible if we display any junimo text.
+In this example, we've used a ğ glyph that is only 6 pixels wide:
+
+![An example texture, rendered at 4x scale, showing one glyph: ğ](sample-bold-texture-3.png)
+
+... so we tell Font Smasher to trim the whitespace when rendering. We also use
+the index for `g`'s junimo glyph, so ğ will be visible if we display any junimo
+text.
 
 
 ## Sprite Fonts
@@ -472,7 +481,8 @@ Will default to `1.0` if unspecified for a new glyph.
 ### Example
 
 For example, let's add the same glyphs from the earlier bold examples (`Ȁ` and
-`ğ`) to the sprite fonts. Here's an example texture (rendered here at 4x), with the SourceRects drawn in and labeled:
+`ğ`) to the sprite fonts. Here's the putative texture this example uses
+(rendered here at 4x), with the SourceRects drawn in and labeled:
 
 ![An example font texture showing the glyphs Ȁ and ğ, with bounding boxes drawn
 and labeled to illustrate how they should be set up by
@@ -531,6 +541,19 @@ users](sample-sprite-texture.png)
   }
 }
 ```
+
+In this example, all we need to do for Ȁ is to give its SourceRect and
+ScaleMetrics: it sits on the baseline, and the default bearings are fine. For
+ğ, it hangs below the baseline by 3 pixels, and because its lower loop juts out
+to the right, it will generally look nicer with less space on that side, so we
+set the RightSideBearing to zero.
+
+Unfortunately, patching both fonts separately means we have to copy-paste the
+patch and change the scaling number. However, Content Patcher has a great
+solution for this problem in [Local
+Tokens](https://github.com/Pathoschild/StardewMods/blob/develop/ContentPatcher/docs/author-guide/tokens.md#local-tokens);
+or if you wish to use different data and thus have two different fonts for
+SpriteFont1 and SmallFont, that option is available to you.
 
 ## Caveats
 
