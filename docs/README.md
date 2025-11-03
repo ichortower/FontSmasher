@@ -22,15 +22,16 @@ And consider the sprite (interface) fonts:
 - Typically loaded before Content Patcher comes online and kept in cache for
   the whole session, so difficult to edit
 
-Second, [Font Settings](https://www.nexusmods.com/stardewvalley/mods/12467) is
-a perfectly cromulent mod that solves the same problems as Font Smasher (lack
-of specific glyphs and/or desire to use different letterforms), but in a
+Second, while [Font
+Settings](https://www.nexusmods.com/stardewvalley/mods/12467) is a perfectly
+cromulent mod and solves some of the same problems as Font Smasher (lack of
+specific glyphs and/or desire to use different letterforms), it does so in a
 user-facing way: it is fully controlled by the user and is opaque to mod
 authors, so if a content modder wants to use extra diacritics or other special
 characters not supported by the base game, the only recourse available is to
-ask users to configure a font that includes the desired glyphs. Not only is
-this prone to error, it leaves the user and the modder unable to use the
-default fonts, if they happen to like them.
+ask users to configure a font that includes the desired glyphs. Not only does
+this add steps, it leaves the user and the modder unable to use the default
+fonts, if they happen to like them.
 
 Font Smasher's purpose is to address both of these issues. It allows modders to
 add glyphs to and/or edit glyphs in the base fonts (or [go ham and replace them
@@ -62,7 +63,7 @@ Patcher](https://github.com/Pathoschild/StardewMods/tree/stable/ContentPatcher).
 Install this mod like any other, by unzipping it into your Mods folder, and let
 the mods that require it do their work.
 
-This mod comes bundled with a sample content pack (`FontSmasherSamplePack`),
+This mod comes bundled with a sample content pack (`FontSmasherSamplePack`)
 which is intended for mod authors. If you don't need it, it is safe to delete.
 
 As a mod author, this framework provides data assets which your mod should edit
@@ -77,5 +78,5 @@ guide](author-guide.md).
 
 ## Special Thanks
 
-- Abagaianye, for the snipe in particular.
+- Abagaianye in particular, for the snipe.
 - Everyone on the Stardew Valley and Stardew Modmakers' discords, in general.

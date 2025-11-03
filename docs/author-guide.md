@@ -19,6 +19,7 @@ that came bundled with this mod.
   - [Example](#example-1)
 - [Caveats](#caveats)
   - [Upper and Lowercase Glyphs](#upper-and-lowercase-glyphs)
+  - [Targeting Specific Languages](#targeting-specific-languages)
   - [Targeting Whitespace Glyphs](#targeting-whitespace-glyphs)
   - [Performance Notes](#performance-notes)
 - [Potential Future Features](#potential-future-features)
@@ -603,10 +604,32 @@ glyph to target, but providing the extra (discarded) information makes the key
 unique and prevents Newtonsoft from collapsing them. This has the advantage of
 letting you put all your glyphs in the same patch, but it might cause
 unexpected behavior if multiple mods edit the same glyph with different
-suffixes: the edits will end up applying in dictionary sort order instead of
-patch priority/load order.
+suffixes: the edits will end up applying in dictionary iteration order instead
+of patch priority/load order.
 
 There are examples of both approaches in the sample content pack.
+
+
+### Targeting Specific Languages
+
+Chinese, Japanese, and Korean fonts are only somewhat supported and typically
+won't look good with the same font patches as the Latin- and Cyrillic-using
+languages. In addition, of the latter group, Russian and German use a different
+scale for SpriteFont1 than the others (200 instead of 300). For these (and
+maybe other) reasons, you may wish to target only some languages with a given
+patch.
+
+To do this, use Content Patcher's `Language` token. For example, to patch only
+when German or Russian is the current language:
+
+```json
+"When": {
+  "Language": "de, ru"
+}```
+
+This token will refresh whenever the game language is changed, and Font Smasher
+is set up to reload its data assets in that event as well, so this should
+suffice to patch only the desired languages.
 
 
 ### Targeting Whitespace Glyphs

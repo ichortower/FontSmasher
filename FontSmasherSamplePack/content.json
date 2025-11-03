@@ -15,7 +15,7 @@
     // mapping data to a glyph, so it is safe to make the key longer in order to avoid collisions.
     // However, note that this may get strange if multiple mods edit the same glyph and choose
     // different suffixes to lengthen, since the resulting glyph data will depend on the
-    // dictionary sort order (when iterating) and not necessarily on patch priority.
+    // dictionary iteration order and not necessarily on patch priority.
     {
       "Target": "ichortower.FontSmasher/BoldFont",
       "Action": "EditData",
