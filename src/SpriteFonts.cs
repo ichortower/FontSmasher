@@ -185,11 +185,6 @@ internal sealed class SpriteFonts
             sb.End();
             Game1.graphics.GraphicsDevice.SetRenderTarget(savedTarget);
             sourceTex = render as Texture2D;
-
-            // FIXME remove this before release!
-            using FileStream stream = File.OpenWrite(
-                    $"/home/ichortower/{fr.DataFieldName}.png");
-            sourceTex.SaveAsPng(stream, sourceTex.Width, sourceTex.Height);
         }
 
         List<Rectangle> boundsList = new();
