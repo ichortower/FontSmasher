@@ -625,7 +625,8 @@ when German or Russian is the current language:
 ```json
 "When": {
   "Language": "de, ru"
-}```
+}
+```
 
 This token will refresh whenever the game language is changed, and Font Smasher
 is set up to reload its data assets in that event as well, so this should
