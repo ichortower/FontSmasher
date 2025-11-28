@@ -22,6 +22,11 @@ internal class Events
                 return new SpriteFontPatchData();
             }, AssetLoadPriority.Exclusive);
         }
+        else if (e.Name.IsEquivalentTo(TextColors.ColorDataAsset)) {
+            e.LoadFrom(() => {
+                return new SpriteFontColorValues();
+            }, AssetLoadPriority.Exclusive);
+        }
     }
 
     public static void OnAssetReady(object sender, AssetReadyEventArgs e)
@@ -35,6 +40,9 @@ internal class Events
                         $"using provided glyph data: {err}");
             }
             break;
+        }
+        if (e.Name.IsEquivalentTo(TextColors.ColorDataAsset)) {
+            TextColors.SaveColors();
         }
     }
 
@@ -52,6 +60,12 @@ internal class Events
             }
             else if (name.IsEquivalentTo(GlyphData.TinyFontAsset)) {
                 GlyphData.TinyFont = null;
+            }
+            else if (name.IsEquivalentTo(TextColors.ColorDataAsset)) {
+                TextColors.Data = null;
+                TextColors.ResetColors();
+                // immediately reload the data; DrawString prefix is too late
+                _ = TextColors.Data;
             }
         }
     }
@@ -90,6 +104,7 @@ internal class Events
         _ = GlyphData.SpriteFont1;
         _ = GlyphData.SmallFont;
         _ = GlyphData.TinyFont;
+        _ = TextColors.Data;
 
         Main.instance.Helper.Events.GameLoop.UpdateTicked -= Events.OnUpdateTicked;
     }
