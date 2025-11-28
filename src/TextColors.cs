@@ -1,8 +1,10 @@
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace ichortower.FontSmasher;
 
@@ -66,14 +68,11 @@ internal sealed class TextColors
                 Log.Warn($"Color value too short: '{s}'");
                 return null;
             }
-            for (int i = 0; i < 3; ++i) {
-                if (!int.TryParse(s.Substring(1+2*i, 2), NumberStyles.HexNumber, null, out values[i])) {
-                    Log.Warn($"Couldn't parse color value '{s}'");
-                    return null;
+            for (int i = 0; i < 4; ++i) {
+                if (1+2*(i+1) > s.Length) {
+                    break;
                 }
-            }
-            if (s.Length >= 9) {
-                if (!int.TryParse(s.Substring(7, 2), NumberStyles.HexNumber, null, out values[3])) {
+                if (!int.TryParse(s.Substring(1+2*i, 2), NumberStyles.HexNumber, null, out values[i])) {
                     Log.Warn($"Couldn't parse color value '{s}'");
                     return null;
                 }
@@ -86,6 +85,28 @@ internal sealed class TextColors
             return c;
         }
         if (s.Substring(0, 3).EqualsIgnoreCase("rgb")) {
+            char[] trimmings = {'a','A','(',')',' '};
+            string[] args = s.Substring(3).Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim(trimmings)).ToArray();
+            if (args.Length < 3) {
+                Log.Warn($"Color value not readable as rgb(a): '{s}'");
+                return null;
+            }
+            for (int i = 0; i < 4; ++i) {
+                if (i >= args.Length) {
+                    break;
+                }
+                if (!int.TryParse(args[i], out values[i])) {
+                    Log.Warn($"Couldn't parse color value '{s}'");
+                    return null;
+                }
+            }
+            Color c = new(values[0], values[1], values[2]);
+            if (values[3] != -1) {
+                c.A = (byte) values[3];
+            }
+            Log.Warn(c.ToString());
+            return c;
         }
         return null;
     }
