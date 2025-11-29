@@ -29,6 +29,10 @@ internal class Patches
                 "drawString",
                 null,
                 nameof(Patches.SpriteText_drawString_Transpiler));
+        PatchMethod(harmony, typeof(StardewValley.Object),
+                nameof(StardewValley.Object.GetCategoryColor),
+                null,
+                nameof(Patches.Object_GetCategoryColor_Postfix));
         // have to patch four separate SpriteBatch.DrawStrings because they all have
         // their own implementations
         PatchMethod(harmony, typeof(SpriteBatch),
@@ -89,13 +93,25 @@ internal class Patches
         }
     }
 
+    internal static void Object_GetCategoryColor_Postfix(
+            int category, ref Color __result)
+    {
+        Log.Info($"Checking color for category {category}");
+        string key = $"Category_{category}";
+        if (!TextColors.Data.TryGetValue(key, out string val)) {
+            return;
+        }
+        Color? ret = TextColors.ColorFromString(val);
+        if (ret is not null) {
+            __result = ret.Value;
+        }
+    }
+
     private static MethodInfo _mgsrfc = null;
     internal static MethodInfo Method_getSourceRectForChar {
         get {
-            if (_mgsrfc is null) {
-                _mgsrfc = typeof(SpriteText).GetMethod("getSourceRectForChar",
-                        BindingFlags.NonPublic | BindingFlags.Static);
-            }
+            _mgsrfc ??= typeof(SpriteText).GetMethod("getSourceRectForChar",
+                    BindingFlags.NonPublic | BindingFlags.Static);
             return _mgsrfc;
         }
         set {
