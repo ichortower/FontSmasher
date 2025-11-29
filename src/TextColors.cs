@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 namespace ichortower.FontSmasher;
 
@@ -59,7 +60,7 @@ internal sealed class TextColors
      *  #rrggbbaa
      *  rgb(r, g, b) (ints 0-255)
      *  rgba(r, g, b, a) (ints 0-255)
-     *  plain color name (tries to find property on Color class)
+     *  @ColorName (tries to find property on Color class)
      */
     internal static Color? ColorFromString(string s)
     {
@@ -112,6 +113,13 @@ internal sealed class TextColors
             }
             Log.Warn(c.ToString());
             return c;
+        }
+        if (s.StartsWith("@")) {
+            PropertyInfo? item = typeof(Color).GetProperty(
+                    s.Substring(1), BindingFlags.Public | BindingFlags.Static);
+            if (item is not null) {
+                return (Color)item.GetValue(null)!;
+            }
         }
         return null;
     }
