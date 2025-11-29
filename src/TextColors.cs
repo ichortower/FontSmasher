@@ -12,17 +12,17 @@ internal sealed class TextColors
 {
     internal static string ColorDataAsset = $"{Main.ModId}/SpriteFontColors";
 
-    public static ColorSet Vanilla = new ColorSet {
-        Text = Game1.textColor,
-        Shadow = Game1.textShadowColor,
-        DarkShadow = Game1.textShadowDarkerColor,
-        Unselected = Game1.unselectedOptionColor,
+    internal static readonly Dictionary<string, Color> Vanilla = new() {
+        {"Text", Game1.textColor},
+        {"Shadow", Game1.textShadowColor},
+        {"DarkShadow", Game1.textShadowDarkerColor},
+        {"Unselected", Game1.unselectedOptionColor},
     };
 
-    private static SpriteFontColorValues _Data = null;
-    public static SpriteFontColorValues Data {
+    private static Dictionary<string, string> _Data = null;
+    internal static Dictionary<string, string> Data {
         get {
-            _Data ??= Game1.content.Load<SpriteFontColorValues>(ColorDataAsset);
+            _Data ??= Game1.content.Load<Dictionary<string,string>>(ColorDataAsset);
             return _Data;
         }
         set {
@@ -32,21 +32,26 @@ internal sealed class TextColors
 
     internal static void SaveColors()
     {
-        Game1.textColor = (Color)(ColorFromString(Data.Text) ?? Vanilla.Text);
-        Game1.textShadowColor = (Color)(ColorFromString(Data.Shadow) ?? Vanilla.Shadow);
-        Game1.textShadowDarkerColor = (Color)(ColorFromString(Data.DarkShadow) ?? Vanilla.DarkShadow);
-        Game1.unselectedOptionColor = (Color)(ColorFromString(Data.Unselected) ?? Vanilla.Unselected);
+        Game1.textColor = GetDataColor("Text") ?? Vanilla["Text"];
+        Game1.textShadowColor = GetDataColor("Shadow") ?? Vanilla["Shadow"];
+        Game1.textShadowDarkerColor = GetDataColor("DarkShadow") ?? Vanilla["DarkShadow"];
+        Game1.unselectedOptionColor = GetDataColor("Unselected") ?? Vanilla["Unselected"];
     }
 
     internal static void ResetColors()
     {
-        Game1.textColor = (Color)Vanilla.Text;
-        Game1.textShadowColor = (Color)Vanilla.Shadow;
-        Game1.textShadowDarkerColor = (Color)Vanilla.DarkShadow;
-        Game1.unselectedOptionColor = (Color)Vanilla.Unselected;
+        Game1.textColor = Vanilla["Text"];
+        Game1.textShadowColor = Vanilla["Shadow"];
+        Game1.textShadowDarkerColor = Vanilla["DarkShadow"];
+        Game1.unselectedOptionColor = Vanilla["Unselected"];
     }
 
 #nullable enable
+
+    internal static Color? GetDataColor(string key)
+    {
+        return Data.TryGetValue(key, out string? val) ? ColorFromString(val) : null;
+    }
 
     /*
      * accepts:
@@ -110,23 +115,6 @@ internal sealed class TextColors
         }
         return null;
     }
-}
-
-internal sealed class ColorSet
-{
-    public Color? Text = null;
-    public Color? Shadow = null;
-    public Color? DarkShadow = null;
-    public Color? Unselected = null;
-}
-
-internal sealed class SpriteFontColorValues
-{
-    public string? Text = null;
-    public string? Shadow = null;
-    public string? DarkShadow = null;
-    public string? Unselected = null;
-    public Dictionary<string, string> Categories = new();
 }
 
 #nullable disable

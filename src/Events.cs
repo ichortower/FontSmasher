@@ -24,7 +24,7 @@ internal class Events
         }
         else if (e.Name.IsEquivalentTo(TextColors.ColorDataAsset)) {
             e.LoadFrom(() => {
-                return new SpriteFontColorValues();
+                return new Dictionary<string, string>();
             }, AssetLoadPriority.Exclusive);
         }
     }
