@@ -87,7 +87,6 @@ internal sealed class TextColors
             if (values[3] != -1) {
                 c.A = (byte)values[3];
             }
-            Log.Warn(c.ToString());
             return c;
         }
         if (s.Substring(0, 3).EqualsIgnoreCase("rgb")) {
@@ -111,7 +110,6 @@ internal sealed class TextColors
             if (values[3] != -1) {
                 c.A = (byte) values[3];
             }
-            Log.Warn(c.ToString());
             return c;
         }
         if (s.StartsWith("@")) {

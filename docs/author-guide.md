@@ -17,6 +17,7 @@ that came bundled with this mod.
   - [Format](#format-1)
   - [Glyph Model Format](#glyph-model-format-1)
   - [Example](#example-1)
+  - [Colors](#colors)
 - [Caveats](#caveats)
   - [Upper and Lowercase Glyphs](#upper-and-lowercase-glyphs)
   - [Targeting Specific Languages](#targeting-specific-languages)
@@ -575,6 +576,97 @@ Tokens](https://github.com/Pathoschild/StardewMods/blob/develop/ContentPatcher/d
 or if you wish to use different data and thus have two different fonts for
 SpriteFont1 and SmallFont, that option is available to you.
 
+
+### Colors
+
+To change the colors the game uses when rendering the SpriteFonts, edit this
+asset:
+
+`ichortower.FontSmasher/SpriteFontColors`
+
+The asset is a string->string dictionary, where the keys are targets and the
+values are string representations of colors to use.
+
+**Warning!**: Due to infelicities in how the sprite font colors are handled by
+the game, these color settings are *global* and are shared between SpriteFont1
+and SmallFont.
+
+Here are the supported targets you can use as keys:
+
+<table>
+</table>
+
+And here are the supported formats you can use when specifying a color:
+
+<table>
+<tr>
+<td><code>#rrggbb</code></td>
+<td>
+
+A six-digit hexadecimal representation of the color, using 8 bits for each
+of red, green, and blue, in that order (example: `#a088b2`). Not
+case-sensitive.
+
+Each value ranges from `00` (0) to `ff` (255).
+
+</td>
+</tr>
+
+<tr>
+<td><code>#rrggbbaa</code></td>
+<td>
+
+An eight-digit hexadecimal representation of the color, using 8 bits for each
+of red, green, blue, and alpha, in that order (example: `#ccb2a980`).
+Identical to the above format, but also specifies an alpha channel value.
+
+Alpha value ranges from `00` (0, fully transparent) to `ff` (255, fully opaque).
+
+</td>
+</tr>
+
+<tr>
+<td><code>rgb(r, g, b)</code></td>
+<td>
+
+A more human-oriented version of the hexadecimal color representation. Give
+three integers inside the parentheses, each from 0 to 255: red, green, and
+blue, in that order (example: `rgb(160, 136, 178)`). Not case-sensitive.
+
+</td>
+</tr>
+
+<tr>
+<td><code>rgba(r, g, b, a)</code></td>
+<td>
+
+Identical to the above format, but also specifies an alpha channel value
+(which should also range from 0 (fully transparent) to 255 (fully opaque)).
+
+The `a` in the opening `rgba(` is optional.
+
+</td>
+</tr>
+
+<tr>
+<td><code>@&lt;ColorName&gt;</code></td>
+<td>
+
+Used to name a color, without having to specify its values directly (example:
+`@White`). The color name must match one of the static properties defined in
+MonoGame's `Color` class.
+
+</td>
+</tr>
+</table>
+
+Note that although you can specify translucent colors using the alpha value, I
+do not generally recommend doing this, due to the way the game draws text
+using the SpriteFonts. First, the game draws the text three times at small
+offsets, using the appropriate shadow color (so a translucent shadow will be
+rendered with overlaps at different resulting opacities), and then it draws
+one more time in the text color (so if that color is translucent, the shadows
+will be visible through it).
 
 ## Caveats
 
