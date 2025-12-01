@@ -23,7 +23,7 @@ function color(name, value) {
 
 END {
     step = ceil(NR/3);
-    for (i = 0; i <= step; ++i) {
+    for (i = 0; i < step; ++i) {
         print "<tr>";
         color(names[i], values[i]);
         color(names[i+step], values[i+step]);
