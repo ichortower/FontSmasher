@@ -1,3 +1,7 @@
+![AliceBlue color swatch](svg/AliceBlue.svg)
+
+<img src="svg/AliceBlue.svg" >
+
 <table>
 <tr><td><code>Transparent</code></td><td>rgb(0,0,0,0)</td><td style="background-color:rgb(0,0,0,0);" ></td><td><code>Azure</code></td><td>rgb(240,255,255)</td><td style="background-color:rgb(240,255,255);" ></td><td><code>Blue</code></td><td>rgb(0,0,255)</td><td style="background-color:rgb(0,0,255);" ></td></tr>
 <tr><td><code>AliceBlue</code></td><td>rgb(240,248,255)</td><td style="background-color:rgb(240,248,255);" ></td><td><code>Beige</code></td><td>rgb(245,245,220)</td><td style="background-color:rgb(245,245,220);" ></td><td><code>BlueViolet</code></td><td>rgb(138,43,226)</td><td style="background-color:rgb(138,43,226);" ></td></tr>
