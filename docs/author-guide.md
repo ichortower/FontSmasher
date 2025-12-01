@@ -705,7 +705,7 @@ The `a` in the opening `rgba(` is optional.
 
 Used to name a color, without having to specify its values directly (example:
 `@White`). The color name must match one of the static properties defined in
-MonoGame's `Color` class ([see here for a list](color-table.md)).
+MonoGame's `Color` class ([see here for a list](color-table.html)).
 
 </td>
 </tr>

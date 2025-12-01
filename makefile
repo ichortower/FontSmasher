@@ -14,9 +14,9 @@ smapi:
 	MODE=${MODE} dotnet build /clp:NoSummary
 	install -m 644 LICENSE "${MOD_DIR}"
 
-colors: docs/color-table.md
+colors: docs/color-table.html
 
-docs/color-table.md: docs/color-data.txt
+docs/color-table.html: docs/color-data.txt
 	awk -f docs/colors.awk "$<" >"$@"
 
 samplepack:

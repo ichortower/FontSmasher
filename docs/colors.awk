@@ -1,5 +1,5 @@
 BEGIN {
-    print "<table>";
+    print "<html><body><table>";
 }
 
 {
@@ -22,5 +22,5 @@ END {
         cell(names[i+2*step], values[i+2*step]);
         print "</tr>";
     }
-    print "</table>";
+    print "</table></body></html>";
 }
