@@ -579,12 +579,19 @@ SpriteFont1 and SmallFont, that option is available to you.
 
 ### Colors
 
-To change the colors the game uses when rendering the SpriteFonts, edit this
-asset:
+When editing the bold font, you have full control over the text color, since the
+texture is used as-is and the shadows are baked in. But SpriteFonts are
+monochrome white (for tinting purposes) and don't include shadows (they are
+generated live). So how do you control what colors the game uses to draw them?
+
+Normally, you don't: The sprite fonts use a selection of hardcoded colors
+when drawing, and there's no facility available to override them. Enter Font
+Smasher! To change the colors the game uses when rendering the SpriteFonts,
+edit this asset:
 
 `ichortower.FontSmasher/SpriteFontColors`
 
-The asset is a string->string dictionary, where the keys are targets and the
+The asset is a string&rarr;string dictionary, where the keys are targets and the
 values are string representations of colors to use.
 
 **Warning!**: Due to infelicities in how the sprite font colors are handled by
@@ -594,6 +601,50 @@ and SmallFont.
 Here are the supported targets you can use as keys:
 
 <table>
+<tr>
+<td><code>Text</code></td>
+<td>
+
+The default text color. The value given here will override `Game1.textColor`.
+
+</td>
+</tr>
+
+<tr>
+<td><code>Shadow</code></td>
+<td>
+
+Together with DarkShadow, this is one of the default shadow colors used to
+render SpriteFonts in most situations in the game. This value overrides
+`Game1.textShadowColor`.
+
+</td>
+</tr>
+
+<tr>
+<td><code>DarkShadow</code></td>
+<td>
+
+Together with Shadow, this is one of the default shadow colors used to render
+SpriteFonts in most situations in the game. This value overrides
+`Game1.textShadowDarkerColor`.
+
+</td>
+</tr>
+
+<tr>
+<td><code>Unselected</code></td>
+<td>
+
+A rarely-used alternate text color (`Game1.unselectedOptionColor`). Vanilla
+uses it in quest objectives and in one kind of dialogue box that I'm not fully
+sure when it appears.
+
+Notably, Generic Mod Config Menu uses this as the hover color for mod names in
+the main list menu, so keep in mind that your users will likely see it there.
+
+</td>
+</tr>
 </table>
 
 And here are the supported formats you can use when specifying a color:
@@ -654,7 +705,7 @@ The `a` in the opening `rgba(` is optional.
 
 Used to name a color, without having to specify its values directly (example:
 `@White`). The color name must match one of the static properties defined in
-MonoGame's `Color` class.
+MonoGame's `Color` class ([see here for a list](color-table.md)).
 
 </td>
 </tr>
@@ -667,6 +718,7 @@ offsets, using the appropriate shadow color (so a translucent shadow will be
 rendered with overlaps at different resulting opacities), and then it draws
 one more time in the text color (so if that color is translucent, the shadows
 will be visible through it).
+
 
 ## Caveats
 
