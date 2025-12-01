@@ -18,7 +18,7 @@ colors: docs/color-table.md
 
 docs/color-table.md: docs/color-data.txt
 	./docs/generate-svgs.bash docs/svg <"$<"
-	awk -f docs/colors.awk "$<" >"$@"
+	awk -f docs/generate-table.awk "$<" >"$@"
 
 samplepack:
 	mkdir -p "${SAMPLE_DIR}/assets"

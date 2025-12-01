@@ -16,9 +16,8 @@ function color(name, value) {
     if (name == "") {
         return;
     }
-    printf "<td align=\"right\"><code>%s</code></td>\n", name;
+    printf "<td align=\"right\"><code>%s</code><br><code>%s</code></td>\n", name, value;
     printf "<td><img src=\"svg/%s.svg\"></td>\n", name;
-    printf "<td>%s</td>\n", value;
 }
 
 END {
