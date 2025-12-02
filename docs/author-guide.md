@@ -645,6 +645,23 @@ the main list menu, so keep in mind that your users will likely see it there.
 
 </td>
 </tr>
+
+<tr>
+<td><code>Category_&lt;category id&gt;</code></td>
+<td>
+
+This key allows you to target a [category of
+item](https://stardewvalleywiki.com/Modding:Items#Categories), by using a
+category's (negative) id in the key. For example, to target the "Animal
+Product" category (-5), you would use the key `Category_-5`.
+
+When rendering the tooltip description for an item, the game normally uses a
+hardcoded color to draw the category name in place of `Game1.textColor` (in
+the wiki link above, the hardcoded color is listed in the table). Specifying
+these keys allows you to override those colors with your own choices.
+
+</td>
+</tr>
 </table>
 
 And here are the supported formats you can use when specifying a color:
@@ -654,9 +671,9 @@ And here are the supported formats you can use when specifying a color:
 <td><code>#rrggbb</code></td>
 <td>
 
-A six-digit hexadecimal representation of the color, using 8 bits for each
-of red, green, and blue, in that order (example: `#a088b2`). Not
-case-sensitive.
+A six-digit hexadecimal representation of the color, using 2 digits (8 bits)
+for each of red, green, and blue, in that order (example: `#a088b2`).
+Not case-sensitive.
 
 Each value ranges from `00` (0) to `ff` (255).
 
@@ -667,8 +684,8 @@ Each value ranges from `00` (0) to `ff` (255).
 <td><code>#rrggbbaa</code></td>
 <td>
 
-An eight-digit hexadecimal representation of the color, using 8 bits for each
-of red, green, blue, and alpha, in that order (example: `#ccb2a980`).
+An eight-digit hexadecimal representation of the color, using 2 digits (8 bits)
+for each of red, green, blue, and alpha, in that order (example: `#ccb2a980`).
 Identical to the above format, but also specifies an alpha channel value.
 
 Alpha value ranges from `00` (0, fully transparent) to `ff` (255, fully opaque).
@@ -683,6 +700,8 @@ Alpha value ranges from `00` (0, fully transparent) to `ff` (255, fully opaque).
 A more human-oriented version of the hexadecimal color representation. Give
 three integers inside the parentheses, each from 0 to 255: red, green, and
 blue, in that order (example: `rgb(160, 136, 178)`). Not case-sensitive.
+
+Values will be clamped to fit within the expected range.
 
 </td>
 </tr>
