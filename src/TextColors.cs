@@ -101,10 +101,11 @@ internal sealed class TextColors
                 if (i >= args.Length) {
                     break;
                 }
-                if (!int.TryParse(args[i], out values[i])) {
+                if (!int.TryParse(args[i], out int v)) {
                     Log.Warn($"Couldn't parse color value '{s}'");
                     return null;
                 }
+                values[i] = Math.Max(0, Math.Min(v, 255));
             }
             Color c = new(values[0], values[1], values[2]);
             if (values[3] != -1) {
@@ -115,10 +116,13 @@ internal sealed class TextColors
         if (s.StartsWith("@")) {
             PropertyInfo? item = typeof(Color).GetProperty(
                     s.Substring(1), BindingFlags.Public | BindingFlags.Static);
-            if (item is not null) {
-                return (Color)item.GetValue(null)!;
+            if (item is null) {
+                Log.Warn($"Color name '{s.Substring(1)}' not found");
+                return null;
             }
+            return (Color)item.GetValue(null)!;
         }
+        Log.Warn($"Couldn't resolve color value '{s}': format not matched");
         return null;
     }
 }
