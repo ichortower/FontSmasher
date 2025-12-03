@@ -17,6 +17,7 @@ that came bundled with this mod.
   - [Format](#format-1)
   - [Glyph Model Format](#glyph-model-format-1)
   - [Example](#example-1)
+  - [Colors](#colors)
 - [Caveats](#caveats)
   - [Upper and Lowercase Glyphs](#upper-and-lowercase-glyphs)
   - [Targeting Specific Languages](#targeting-specific-languages)
@@ -575,6 +576,187 @@ Tokens](https://github.com/Pathoschild/StardewMods/blob/develop/ContentPatcher/d
 or if you wish to use different data and thus have two different fonts for
 SpriteFont1 and SmallFont, that option is available to you.
 
+
+### Colors
+
+When editing the bold font, you have full control over the text color, since the
+texture is used as-is and the shadows are baked in. But SpriteFonts are
+monochrome white (for tinting purposes) and don't include shadows (they are
+generated live). So how do you control what colors the game uses to draw them?
+
+Normally, you don't: The sprite fonts use a selection of hardcoded colors
+when drawing, and there's no facility available to override them. Enter Font
+Smasher! To change the colors the game uses when rendering the SpriteFonts,
+edit this asset:
+
+`ichortower.FontSmasher/SpriteFontColors`
+
+The asset is a string&rarr;string dictionary, where the keys are targets and the
+values are string representations of colors to use.
+
+**Warning!**: Due to infelicities in how the sprite font colors are handled by
+the game, these color settings are *global* and are shared between SpriteFont1
+and SmallFont.
+
+Here are the supported targets you can use as keys:
+
+<table>
+<tr>
+<td><code>Text</code></td>
+<td>
+
+The default text color. The value given here will override `Game1.textColor`.
+
+</td>
+</tr>
+
+<tr>
+<td><code>Shadow</code></td>
+<td>
+
+Together with DarkShadow, this is one of the default shadow colors used to
+render SpriteFonts in most situations in the game. This value overrides
+`Game1.textShadowColor`.
+
+</td>
+</tr>
+
+<tr>
+<td><code>DarkShadow</code></td>
+<td>
+
+Together with Shadow, this is one of the default shadow colors used to render
+SpriteFonts in most situations in the game. This value overrides
+`Game1.textShadowDarkerColor`.
+
+</td>
+</tr>
+
+<tr>
+<td><code>Unselected</code></td>
+<td>
+
+A rarely-used alternate text color (overriding `Game1.unselectedOptionColor`).
+Vanilla uses it in quest objectives and in one kind of dialogue box that I'm
+not fully sure when it appears.
+
+Notably, Generic Mod Config Menu uses this as the hover color for mod names in
+the main list menu, so keep in mind that your users will likely see it there.
+
+</td>
+</tr>
+
+<tr>
+<td><code>Category_&lt;category id&gt;</code></td>
+<td>
+
+This key allows you to target a [category of
+item](https://stardewvalleywiki.com/Modding:Items#Categories), by using a
+category's (negative) id in the key. For example, to target the "Animal
+Product" category (-5), you would use the key `Category_-5`.
+
+When rendering the tooltip description for an item, the game normally uses a
+hardcoded color to draw the category name in place of `Game1.textColor` (in
+the wiki link above, the hardcoded color is listed in the table). Specifying
+these keys allows you to override those colors with your own choices.
+
+</td>
+</tr>
+</table>
+
+And here are the supported formats you can use when specifying a color:
+
+<table>
+<tr>
+<td><code>#rrggbb</code></td>
+<td>
+
+A six-digit hexadecimal representation of the color, using 2 digits (8 bits)
+for each of red, green, and blue, in that order (example: `#a088b2`).
+Not case-sensitive.
+
+Each value ranges from `00` (0) to `ff` (255).
+
+</td>
+</tr>
+
+<tr>
+<td><code>#rrggbbaa</code></td>
+<td>
+
+An eight-digit hexadecimal representation of the color, using 2 digits (8 bits)
+for each of red, green, blue, and alpha, in that order (example: `#ccb2a980`).
+Identical to the above format, but also specifies an alpha channel value.
+
+Alpha value ranges from `00` (0, fully transparent) to `ff` (255, fully opaque).
+
+</td>
+</tr>
+
+<tr>
+<td><code>rgb(r, g, b)</code></td>
+<td>
+
+A more human-oriented version of the hexadecimal color representation. Give
+three integers inside the parentheses, each from 0 to 255: red, green, and
+blue, in that order (example: `rgb(160, 136, 178)`). Not case-sensitive.
+
+Values will be clamped to fit within the expected range.
+
+</td>
+</tr>
+
+<tr>
+<td><code>rgba(r, g, b, a)</code></td>
+<td>
+
+Identical to the above format, but also specifies an alpha channel value
+(which should also range from 0 (fully transparent) to 255 (fully opaque)).
+
+The `a` in the opening `rgba(` is optional.
+
+</td>
+</tr>
+
+<tr>
+<td><code>@&lt;ColorName&gt;</code></td>
+<td>
+
+Used to name a color, without having to specify its values directly (example:
+`@White`). The color name must match one of the static properties defined in
+MonoGame's `Color` class ([see here for a list](color-table.md)).
+
+</td>
+</tr>
+</table>
+
+Note that although you can specify translucent colors using the alpha value, I
+do not generally recommend doing this, due to the way the game draws text
+using the SpriteFonts. First, the game draws the text three times at small
+offsets, using the appropriate shadow color (so a translucent shadow will be
+rendered with overlaps at different resulting opacities), and then it draws
+one more time in the text color (so if that color is translucent, the shadows
+will be visible through it).
+
+As an example, here's how a patch might look that sets SpriteFont text colors
+to match the font_bold appearance in [an excellent interface recolor
+mod](https://www.nexusmods.com/stardewvalley/mods/17323):
+
+```json
+{
+  "Target": "ichortower.FontSmasher/SpriteFontColors",
+  "Action": "EditData",
+  "Entries": {
+    "Text": "#583535",
+    "Shadow": "rgb(201, 170, 160)",
+    "DarkShadow": "#c39a90ff",
+    "Unselected": "rgba(134, 86, 86, 255)"
+  },
+  "When": {
+    "HasMod |contains=VinillaBean.LavenderDreams": true
+  }
+}
+```
 
 ## Caveats
 

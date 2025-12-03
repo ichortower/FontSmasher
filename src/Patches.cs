@@ -29,6 +29,10 @@ internal class Patches
                 "drawString",
                 null,
                 nameof(Patches.SpriteText_drawString_Transpiler));
+        PatchMethod(harmony, typeof(StardewValley.Object),
+                nameof(StardewValley.Object.GetCategoryColor),
+                null,
+                nameof(Patches.Object_GetCategoryColor_Postfix));
         // have to patch four separate SpriteBatch.DrawStrings because they all have
         // their own implementations
         PatchMethod(harmony, typeof(SpriteBatch),
@@ -51,14 +55,19 @@ internal class Patches
                     typeof(float), typeof(Vector2), typeof(Vector2), typeof(SpriteEffects),
                     typeof(float)},
                 nameof(Patches.SpriteBatch_DrawString_Prefix));
+        // need to postfix this returning-to-title function because it resets the text colors
+        // and it isn't called 1-to-1 with the ReturnedToTitle SMAPI event
+        PatchMethod(harmony, typeof(Game1),
+                nameof(Game1.ResetGameStateOnTitleScreen),
+                null,
+                nameof(Patches.Game1_ResetGameStateOnTitleScreen_Postfix));
     }
 
 
-    internal static void SpriteBatch_DrawString_Prefix(
-            SpriteFont spriteFont)
+    internal static void SpriteBatch_DrawString_Prefix(SpriteFont spriteFont)
     {
-        // these look odd, but accessing the GlyphData objects triggers a load (synchronous),
-        // and when the load completes it fires AssetReady which patches the font in-place
+        // reminder that accessing the SpriteFontPatchData objects triggers a (synchronous)
+        // load, and AssetReady patches the font in-place
         if (System.Object.ReferenceEquals(spriteFont, Game1.dialogueFont)) {
             _ = GlyphData.SpriteFont1;
         }
@@ -70,6 +79,11 @@ internal class Patches
         }
     }
 
+    internal static void Game1_ResetGameStateOnTitleScreen_Postfix()
+    {
+        TextColors.SaveColors();
+    }
+
     internal static void SpriteText_getWidthOffsetForChar_Postfix(
             char c, ref int __result)
     {
@@ -79,13 +93,25 @@ internal class Patches
         }
     }
 
+    internal static void Object_GetCategoryColor_Postfix(
+            int category, ref Color __result)
+    {
+        Log.Info($"Checking color for category {category}");
+        string key = $"Category_{category}";
+        if (!TextColors.Data.TryGetValue(key, out string val)) {
+            return;
+        }
+        Color? ret = TextColors.ColorFromString(val);
+        if (ret is not null) {
+            __result = ret.Value;
+        }
+    }
+
     private static MethodInfo _mgsrfc = null;
     internal static MethodInfo Method_getSourceRectForChar {
         get {
-            if (_mgsrfc is null) {
-                _mgsrfc = typeof(SpriteText).GetMethod("getSourceRectForChar",
-                        BindingFlags.NonPublic | BindingFlags.Static);
-            }
+            _mgsrfc ??= typeof(SpriteText).GetMethod("getSourceRectForChar",
+                    BindingFlags.NonPublic | BindingFlags.Static);
             return _mgsrfc;
         }
         set {

@@ -14,6 +14,12 @@ smapi:
 	MODE=${MODE} dotnet build /clp:NoSummary
 	install -m 644 LICENSE "${MOD_DIR}"
 
+colors: docs/color-table.md
+
+docs/color-table.md: docs/color-data.txt
+	./docs/generate-svgs.bash docs/svg <"$<"
+	awk -f docs/generate-table.awk "$<" >"$@"
+
 samplepack:
 	mkdir -p "${SAMPLE_DIR}/assets"
 	install -m 644 "${SAMPLE_PACK}"/assets/*.png "${SAMPLE_DIR}/assets/"
