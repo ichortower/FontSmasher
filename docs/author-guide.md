@@ -636,9 +636,9 @@ SpriteFonts in most situations in the game. This value overrides
 <td><code>Unselected</code></td>
 <td>
 
-A rarely-used alternate text color (`Game1.unselectedOptionColor`). Vanilla
-uses it in quest objectives and in one kind of dialogue box that I'm not fully
-sure when it appears.
+A rarely-used alternate text color (overriding `Game1.unselectedOptionColor`).
+Vanilla uses it in quest objectives and in one kind of dialogue box that I'm
+not fully sure when it appears.
 
 Notably, Generic Mod Config Menu uses this as the hover color for mod names in
 the main list menu, so keep in mind that your users will likely see it there.
@@ -738,6 +738,25 @@ rendered with overlaps at different resulting opacities), and then it draws
 one more time in the text color (so if that color is translucent, the shadows
 will be visible through it).
 
+As an example, here's how a patch might look that sets SpriteFont text colors
+to match the font_bold appearance in [an excellent interface recolor
+mod](https://www.nexusmods.com/stardewvalley/mods/17323):
+
+```json
+{
+  "Target": "ichortower.FontSmasher/SpriteFontColors",
+  "Action": "EditData",
+  "Entries": {
+    "Text": "#583535",
+    "Shadow": "rgb(201, 170, 160)",
+    "DarkShadow": "#c39a90ff",
+    "Unselected": "rgba(134, 86, 86, 255)"
+  },
+  "When": {
+    "HasMod |contains=VinillaBean.LavenderDreams": true
+  }
+}
+``
 
 ## Caveats
 
