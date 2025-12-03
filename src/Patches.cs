@@ -96,7 +96,6 @@ internal class Patches
     internal static void Object_GetCategoryColor_Postfix(
             int category, ref Color __result)
     {
-        Log.Info($"Checking color for category {category}");
         string key = $"Category_{category}";
         if (!TextColors.Data.TryGetValue(key, out string val)) {
             return;
