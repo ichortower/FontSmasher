@@ -756,7 +756,7 @@ mod](https://www.nexusmods.com/stardewvalley/mods/17323):
     "HasMod |contains=VinillaBean.LavenderDreams": true
   }
 }
-``
+```
 
 ## Caveats
 
